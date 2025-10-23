@@ -1,5 +1,5 @@
 import Github from 'lucide-react/dist/esm/icons/github';
-import Linkedin from 'lucide-react/dist/esm/icons/linkedin';
+import Twitter from 'lucide-react/dist/esm/icons/twitter';
 import Mail from 'lucide-react/dist/esm/icons/mail';
 
 export default function Footer() {
@@ -24,16 +24,16 @@ export default function Footer() {
             <Github className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
           </a>
           <a
-            href="https://linkedin.com/in/ohmudassir"
+            href="https://x.com/heyimudassir"
             target="_blank"
             rel="noopener noreferrer"
             className="group p-2 rounded-full hover:bg-primary/10 transition"
-            aria-label="LinkedIn"
+            aria-label="Twitter"
           >
-            <Linkedin className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+            <Twitter className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
           </a>
           <a
-            href="mailto:ohmudassir@gmail.com"
+            href="mailto:heyimudassir@gmail.com"
             className="group p-2 rounded-full hover:bg-primary/10 transition"
             aria-label="Email"
           >
