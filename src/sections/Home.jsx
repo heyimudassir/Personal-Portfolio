@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+// 1. YAHAN 'useRef' IMPORT KAREIN
+import { useState, useEffect, useRef } from "react";
 import avatar from "../assets/profile.jpg";
 import clsx from "clsx";
 import FadeInSection from "../components/FadeInSection";
@@ -9,18 +10,68 @@ export default function Home() {
   const [index, setIndex] = useState(0);
   const [fade, setFade] = useState(false);
 
+  // 2. YAHAN PAR REFS ADD KAREIN
+  const fadeTimerRef = useRef(null);
+  const nextCycleTimerRef = useRef(null);
+
+  // 3. APNA PURANA 'useEffect' HATA KAR YEH POORA NAYA WALA PASTE KAREIN
   useEffect(() => {
-    const interval = setInterval(() => {
-      setFade(true);
-      setTimeout(() => {
+    const totalDuration = 2000;
+    const fadeDuration = 500;
+
+    // Animation ka function
+    const animate = () => {
+      setFade(true); // 1. Fade-out shuru
+
+      // Pehle fade timer ko clear karein (safety)
+      clearTimeout(fadeTimerRef.current);
+      
+      fadeTimerRef.current = setTimeout(() => {
         setIndex((prev) => (prev + 1) % skills.length);
-        setFade(false);
-      }, 500);
-    }, 2000);
+        setFade(false); // 2. Fade-in shuru
 
-    return () => clearInterval(interval);
-  }, []);
+        // Pehle next cycle timer ko clear karein (safety)
+        clearTimeout(nextCycleTimerRef.current);
+        
+        // 3. Agla cycle schedule karein
+        nextCycleTimerRef.current = setTimeout(
+          animate,
+          totalDuration - fadeDuration
+        );
+      }, fadeDuration);
+    };
+    
+    // Function jo tab ki visibility check karega
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Agar tab active nahi hai, to dono timers rok dein (PAUSE)
+        clearTimeout(fadeTimerRef.current);
+        clearTimeout(nextCycleTimerRef.current);
+      } else {
+        // Agar tab wapas active hua hai, to animation foran start karein
+        animate();
+      }
+    };
 
+    // Pehli animation start karein
+    nextCycleTimerRef.current = setTimeout(
+      animate,
+      totalDuration - fadeDuration
+    );
+
+    // Browser ko batayein ke tab change honay par 'handleVisibilityChange' function call kare
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Cleanup: Jab component unmount ho, to sab kuch saaf kar dein
+    return () => {
+      clearTimeout(fadeTimerRef.current);
+      clearTimeout(nextCycleTimerRef.current);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []); // Empty array bilkul theek hai
+
+
+  // AAPKA BAAKI KA JSX WAISE HI RAHEGA
   return (
     <FadeInSection>
       <section
@@ -33,9 +84,9 @@ export default function Home() {
           className="w-32 h-32 rounded-full object-cover shadow-material mb-4 object-top"
         />
         <h1 className="text-4xl md:text-5xl font-bold text-primary mb-2 flex justify-center items-center">
-  <span className="inline-block">Mudassir</span>
-  <span className="inline-block ml-2 text-3xl">👋</span> {/* ml-2 for margin-left, text-3xl for slightly smaller emoji if needed */}
-</h1>
+          <span className="inline-block">Mudassir</span>
+          <span className="inline-block ml-2 text-3xl">👋</span>
+        </h1>
 
         <h2 className="text-2xl md:text-3xl font-bold text-onSurface mb-1">
           Building modern solutions with
