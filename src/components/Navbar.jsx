@@ -85,7 +85,7 @@ export default function Navbar() {
 
         {/* Mobile menu */}
         {open && (
-          <div className="absolute top-full left-0 w-full mt-2 z-40 px-4 py-3 bg-white/90 backdrop-blur rounded-[30px] shadow-md mx-2">
+          <div className="absolute top-full left-0 right-0 mt-2 z-40 px-4 py-3 bg-white/90 backdrop-blur rounded-[30px] shadow-md">
             <ul>
               {navItems.map(({ href, name }) => (
                 <li key={href}>
