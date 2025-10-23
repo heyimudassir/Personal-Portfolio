@@ -1,4 +1,3 @@
-// 1. YAHAN 'useRef' IMPORT KAREIN
 import { useState, useEffect, useRef } from "react";
 import avatar from "../assets/profile.jpg";
 import clsx from "clsx";
@@ -10,68 +9,78 @@ export default function Home() {
   const [index, setIndex] = useState(0);
   const [fade, setFade] = useState(false);
 
-  // 2. YAHAN PAR REFS ADD KAREIN
+  // Refs for timers and visibility state
   const fadeTimerRef = useRef(null);
   const nextCycleTimerRef = useRef(null);
+  const isHiddenRef = useRef(document.hidden);
 
-  // 3. APNA PURANA 'useEffect' HATA KAR YEH POORA NAYA WALA PASTE KAREIN
   useEffect(() => {
     const totalDuration = 2000;
     const fadeDuration = 500;
 
-    // Animation ka function
+    // Animation function
     const animate = () => {
-      setFade(true); // 1. Fade-out shuru
+      // Don't run animation if tab is hidden
+      if (isHiddenRef.current) return;
 
-      // Pehle fade timer ko clear karein (safety)
+      setFade(true); // 1. Start fade-out
+
       clearTimeout(fadeTimerRef.current);
-      
       fadeTimerRef.current = setTimeout(() => {
         setIndex((prev) => (prev + 1) % skills.length);
-        setFade(false); // 2. Fade-in shuru
+        setFade(false); // 2. Start fade-in
 
-        // Pehle next cycle timer ko clear karein (safety)
         clearTimeout(nextCycleTimerRef.current);
-        
-        // 3. Agla cycle schedule karein
         nextCycleTimerRef.current = setTimeout(
           animate,
           totalDuration - fadeDuration
         );
       }, fadeDuration);
     };
-    
-    // Function jo tab ki visibility check karega
+
+    // Function to handle tab visibility changes
     const handleVisibilityChange = () => {
-      if (document.hidden) {
-        // Agar tab active nahi hai, to dono timers rok dein (PAUSE)
-        clearTimeout(fadeTimerRef.current);
-        clearTimeout(nextCycleTimerRef.current);
-      } else {
-        // Agar tab wapas active hua hai, to animation foran start karein
-        animate();
+      isHiddenRef.current = document.hidden;
+
+      // Always clear timers to pause animation
+      clearTimeout(fadeTimerRef.current);
+      clearTimeout(nextCycleTimerRef.current);
+
+      if (!document.hidden) {
+        // If tab is visible again (Resume)
+        
+        // 1. Instantly set to visible (prevents flicker on return)
+        setFade(false); 
+        
+        // 2. Schedule the *next* animation cycle
+        nextCycleTimerRef.current = setTimeout(
+          animate,
+          totalDuration - fadeDuration
+        );
       }
+      // If tab is hidden, timers are cleared and nothing else happens (Paused)
     };
 
-    // Pehli animation start karein
-    nextCycleTimerRef.current = setTimeout(
-      animate,
-      totalDuration - fadeDuration
-    );
+    // Start the first animation cycle (only if tab is currently visible)
+    if (!isHiddenRef.current) {
+      nextCycleTimerRef.current = setTimeout(
+        animate,
+        totalDuration - fadeDuration
+      );
+    }
 
-    // Browser ko batayein ke tab change honay par 'handleVisibilityChange' function call kare
+    // Add the event listener for tab visibility
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    // Cleanup: Jab component unmount ho, to sab kuch saaf kar dein
+    // Cleanup function to remove timers and listener
     return () => {
       clearTimeout(fadeTimerRef.current);
       clearTimeout(nextCycleTimerRef.current);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, []); // Empty array bilkul theek hai
+  }, []); // Empty dependency array is correct
 
-
-  // AAPKA BAAKI KA JSX WAISE HI RAHEGA
+  // The rest of your component's JSX
   return (
     <FadeInSection>
       <section
