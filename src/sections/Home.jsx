@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import avatar from "../assets/avatar.webp";
+import avatar from "../assets/profile.jpg";
 import clsx from "clsx";
 import FadeInSection from "../components/FadeInSection";
 
@@ -30,11 +30,12 @@ export default function Home() {
         <img
           src={avatar}
           alt="Avatar"
-          className="w-32 h-32 rounded-full object-cover shadow-material mb-4"
+          className="w-32 h-32 rounded-full object-cover shadow-material mb-4 object-top"
         />
-        <h1 className="text-4xl md:text-5xl font-bold text-primary mb-2">
-          Mudassir 👋
-        </h1>
+        <h1 className="text-4xl md:text-5xl font-bold text-primary mb-2 flex justify-center items-center">
+  <span className="inline-block">Mudassir</span>
+  <span className="inline-block ml-2 text-3xl">👋</span> {/* ml-2 for margin-left, text-3xl for slightly smaller emoji if needed */}
+</h1>
 
         <h2 className="text-2xl md:text-3xl font-bold text-onSurface mb-1">
           Building modern solutions with
@@ -46,6 +47,7 @@ export default function Home() {
               "inline-block",
               fade ? "animate-dust" : "animate-appear"
             )}
+            aria-live="polite"
           >
             {skills[index]}
           </span>
