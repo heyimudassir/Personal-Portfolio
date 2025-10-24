@@ -1,11 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import avatar from "../assets/profile.jpg";
 import clsx from "clsx";
-import FadeInSection from "../components/FadeInSection";
+
+// 1. Paths ab theek hain
+import avatar from "../assets/profile.jpg"; 
+import FadeInSection from "../components/FadeInSection"; 
 
 const skills = ["React", "Internet of Things", "Desktop Apps"];
 
-export default function Home() {
+export default function Home({ onOpenLogbook }) {
+  // 2. YAHAN SE EXTRA '=' HATA DIYA HAI
   const [index, setIndex] = useState(0);
   const [fade, setFade] = useState(false);
 
@@ -14,21 +17,19 @@ export default function Home() {
   const nextCycleTimerRef = useRef(null);
   const isHiddenRef = useRef(document.hidden);
 
+  // --- Animation flicker fix (Yeh code theek hai) ---
   useEffect(() => {
     const totalDuration = 2000;
     const fadeDuration = 500;
 
-    // Animation function
     const animate = () => {
-      // Don't run animation if tab is hidden
       if (isHiddenRef.current) return;
-
-      setFade(true); // 1. Start fade-out
+      setFade(true); 
 
       clearTimeout(fadeTimerRef.current);
       fadeTimerRef.current = setTimeout(() => {
         setIndex((prev) => (prev + 1) % skills.length);
-        setFade(false); // 2. Start fade-in
+        setFade(false); 
 
         clearTimeout(nextCycleTimerRef.current);
         nextCycleTimerRef.current = setTimeout(
@@ -38,30 +39,20 @@ export default function Home() {
       }, fadeDuration);
     };
 
-    // Function to handle tab visibility changes
     const handleVisibilityChange = () => {
       isHiddenRef.current = document.hidden;
-
-      // Always clear timers to pause animation
       clearTimeout(fadeTimerRef.current);
       clearTimeout(nextCycleTimerRef.current);
 
       if (!document.hidden) {
-        // If tab is visible again (Resume)
-        
-        // 1. Instantly set to visible (prevents flicker on return)
         setFade(false); 
-        
-        // 2. Schedule the *next* animation cycle
         nextCycleTimerRef.current = setTimeout(
           animate,
           totalDuration - fadeDuration
         );
       }
-      // If tab is hidden, timers are cleared and nothing else happens (Paused)
     };
 
-    // Start the first animation cycle (only if tab is currently visible)
     if (!isHiddenRef.current) {
       nextCycleTimerRef.current = setTimeout(
         animate,
@@ -69,18 +60,16 @@ export default function Home() {
       );
     }
 
-    // Add the event listener for tab visibility
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    // Cleanup function to remove timers and listener
     return () => {
       clearTimeout(fadeTimerRef.current);
       clearTimeout(nextCycleTimerRef.current);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, []); // Empty dependency array is correct
+  }, []); // Empty dependency array bilkul theek hai
 
-  // The rest of your component's JSX
+  // --- Return statement (Yeh code theek hai) ---
   return (
     <FadeInSection>
       <section
@@ -92,7 +81,7 @@ export default function Home() {
           alt="Avatar"
           className="w-32 h-32 rounded-full object-cover shadow-material mb-4 object-top"
         />
-        <h1 className="text-4xl md:text-5xl font-bold text-primary mb-2 flex justify-center items-center">
+        <h1 className="text-4l md:text-5xl font-bold text-primary mb-2 flex justify-center items-center">
           <span className="inline-block">Mudassir</span>
           <span className="inline-block ml-2 text-3xl">👋</span>
         </h1>
@@ -113,13 +102,23 @@ export default function Home() {
           </span>
         </h2>
 
-        <a
-          href="/MudassirNadeem.pdf"
-          download
-          className="mt-6 px-6 py-3 bg-primary text-white font-medium rounded-full shadow-material hover:opacity-90 transition"
-        >
-          Download CV
-        </a>
+        <div className="flex flex-col sm:flex-row gap-4 mt-6">
+          <a
+            href="/MudassirNadeem.pdf" 
+            download
+            className="px-6 py-3 bg-primary text-white font-medium rounded-full shadow-material hover:opacity-90 transition"
+          >
+            Download CV
+          </a>
+
+          <button
+            onClick={onOpenLogbook}
+            className="px-6 py-3 bg-white/80 backdrop-blur rounded-full shadow-material text-primary font-medium hover:bg-primary/10 transition"
+          >
+            View Work Log
+          </button>
+        </div>
+        
       </section>
     </FadeInSection>
   );
