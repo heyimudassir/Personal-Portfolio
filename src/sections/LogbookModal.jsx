@@ -4,15 +4,26 @@ import sanityClient from "../sanityClient";
 import { PortableText } from "@portabletext/react"; 
 import imageUrlBuilder from "@sanity/image-url"; 
 import avatar from "../assets/profile.jpg"; 
-
-// 1. --- NAYA SKELETON COMPONENT IMPORT KAREIN ---
-// (Path check kar lein, yeh 'sections' se bahar 'components' mein hai)
 import LogbookSkeleton from "../components/LogbookSkeleton";
 
 const builder = imageUrlBuilder(sanityClient);
 function urlFor(source) {
   return builder.image(source);
 }
+
+// 1. --- YEH NAYA COMPONENT HAI JO LINKS KO RENDER KAREGA ---
+const LinkRenderer = ({ children, value }) => {
+  return (
+    <a
+      href={value.href}
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="text-primary font-medium hover:underline" // Theme color + hover
+    >
+      {children}
+    </a>
+  );
+};
 
 export default function LogbookModal({ onClose }) {
   const [posts, setPosts] = useState(null);
@@ -62,16 +73,13 @@ export default function LogbookModal({ onClose }) {
       {/* Feed Layout */}
       <div className="max-w-3xl mx-auto space-y-6 pb-12">
         
-        {/* --- 2. YEH LOADING SECTION CHANGE HUA HAI --- */}
         {loading && (
           <>
-            {/* Hum 2-3 skeleton posts dikhayeinge */}
             <LogbookSkeleton />
             <LogbookSkeleton />
           </>
         )}
 
-        {/* Jab loading false ho, tab posts dikhayein */}
         {!loading && posts &&
           posts.map((post) => (
             <div
@@ -106,6 +114,7 @@ export default function LogbookModal({ onClose }) {
                 <PortableText
                   value={post.body}
                   components={{
+                    // 2. --- YEH 'types' OBJECT HAI (Images ke liye) ---
                     types: {
                       image: ({ value }) => (
                         <img
@@ -114,6 +123,10 @@ export default function LogbookModal({ onClose }) {
                           className="w-full h-auto rounded-lg my-4"
                         />
                       ),
+                    },
+                    // 3. --- YEH NAYA 'marks' OBJECT HAI (Links ke liye) ---
+                    marks: {
+                      link: LinkRenderer, // 'link' mark ko humare naye component se render karo
                     },
                   }}
                 />
