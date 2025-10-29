@@ -1,14 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import clsx from "clsx";
-
-// 1. Paths ab theek hain
 import avatar from "../assets/profile.jpg"; 
 import FadeInSection from "../components/FadeInSection"; 
 
 const skills = ["React", "Internet of Things", "Desktop Apps"];
 
-export default function Home({ onOpenLogbook }) {
-  // 2. YAHAN SE EXTRA '=' HATA DIYA HAI
+export default function Home({ onOpenLogbook, isPaused }) {
   const [index, setIndex] = useState(0);
   const [fade, setFade] = useState(false);
 
@@ -16,18 +13,26 @@ export default function Home({ onOpenLogbook }) {
   const fadeTimerRef = useRef(null);
   const nextCycleTimerRef = useRef(null);
   const isHiddenRef = useRef(document.hidden);
+  const isPausedRef = useRef(isPaused); 
 
-  // --- Animation flicker fix (Yeh code theek hai) ---
+  useEffect(() => {
+    isPausedRef.current = isPaused;
+    if (!isPaused) {
+      setFade(false);
+    }
+  }, [isPaused]); 
+
   useEffect(() => {
     const totalDuration = 2000;
     const fadeDuration = 500;
 
     const animate = () => {
-      if (isHiddenRef.current) return;
+      if (isHiddenRef.current || isPausedRef.current) return;
       setFade(true); 
 
       clearTimeout(fadeTimerRef.current);
       fadeTimerRef.current = setTimeout(() => {
+        if (isHiddenRef.current || isPausedRef.current) return;
         setIndex((prev) => (prev + 1) % skills.length);
         setFade(false); 
 
@@ -44,7 +49,7 @@ export default function Home({ onOpenLogbook }) {
       clearTimeout(fadeTimerRef.current);
       clearTimeout(nextCycleTimerRef.current);
 
-      if (!document.hidden) {
+      if (!document.hidden && !isPausedRef.current) {
         setFade(false); 
         nextCycleTimerRef.current = setTimeout(
           animate,
@@ -53,7 +58,7 @@ export default function Home({ onOpenLogbook }) {
       }
     };
 
-    if (!isHiddenRef.current) {
+    if (!isHiddenRef.current && !isPausedRef.current) {
       nextCycleTimerRef.current = setTimeout(
         animate,
         totalDuration - fadeDuration
@@ -67,9 +72,8 @@ export default function Home({ onOpenLogbook }) {
       clearTimeout(nextCycleTimerRef.current);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, []); // Empty dependency array bilkul theek hai
+  }, []); 
 
-  // --- Return statement (Yeh code theek hai) ---
   return (
     <FadeInSection>
       <section
@@ -81,10 +85,22 @@ export default function Home({ onOpenLogbook }) {
           alt="Avatar"
           className="w-32 h-32 rounded-full object-cover shadow-material mb-4 object-top"
         />
-        <h1 className="text-4l md:text-5xl font-bold text-primary mb-2 flex justify-center items-center">
-          <span className="inline-block">Mudassir</span>
-          <span className="inline-block ml-2 text-3xl">👋</span>
+        
+        {/* --- YAHAN CHANGE KIYA GAYA HAI --- */}
+        {/* 1. 'text-center' poore h1 ko center karega */}
+        <h1 className="text-4xl md:text-5xl font-bold text-primary mb-2 text-center">
+          {/* 2. Yeh 'span' ab relative hai aur text-center ki wajah se center mein hoga */}
+          <span className="relative inline-block">
+            {/* 3. Aapka naam */}
+            Mudassir
+            
+            {/* 4. Emoji ab 'absolute' hai, yeh layout flow mein nahi hai */}
+            <span className="absolute top-0 -right-9 md:-right-11 text-3xl">
+              👋
+            </span>
+          </span>
         </h1>
+        {/* --- END OF CHANGE --- */}
 
         <h2 className="text-2xl md:text-3xl font-bold text-onSurface mb-1">
           Building modern solutions with
