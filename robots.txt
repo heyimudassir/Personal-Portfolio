@@ -1,3 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://heyimudassir.netlify.app/sitemap.xml
