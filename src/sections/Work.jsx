@@ -1,264 +1,209 @@
-import React, { useState, useRef } from "react";
-import projects from "../data/projects";
-import videoThumbnail from "../assets/iot.svg";
+import { useState, useRef } from "react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { Github, ExternalLink, Cpu, Monitor, Play, X } from "lucide-react";
 
-const getThumbnail = (project) => {
-  if (project.image) return project.image;
-  if (project.video) return videoThumbnail;
-  return "/images/placeholder.png";
-};
+// --- IMPORTS ---
+import imgStudent from "../assets/desktopApp.svg";
+import vidStudent from "../assets/desktopAppVideo.mp4";
 
-const renderDescription = (project) => {
-  if (!Array.isArray(project.description)) {
-    return <p className="text-onSurface mb-4">{project.description}</p>;
+import imgSolar from "../assets/solarThumbnail.svg";
+import vidSolar from "../assets/solar.mp4";
+
+import imgFault from "../assets/Fault.svg";
+import vidFault from "../assets/FaultVideo.mp4";
+
+const projects = [
+  {
+    id: 1,
+    title: "Student Management System",
+    category: "Desktop App",
+    description: "A Python-based desktop application designed to simplify attendance tracking, student data handling, and overall academic management.",
+    tags: ["Python", "Tkinter", "CSV", "CustomTkinter"],
+    icon: <Monitor />,
+    color: "bg-purple-100",
+    image: imgStudent,
+    video: vidStudent,
+    github: "https://github.com/yourusername/student-system", 
+  },
+  {
+    id: 2,
+    title: "Solar Cleaner via Bluetooth",
+    category: "IoT System",
+    description: "IoT-based Solar Panel Cleaning System using HC-05 Bluetooth module. Allows remote cleaning via mobile app.",
+    tags: ["Arduino", "Python", "MQTT", "Sensors"],
+    icon: <Cpu />,
+    color: "bg-blue-100",
+    image: imgSolar,
+    video: vidSolar,
+    github: "https://github.com/yourusername/solar-cleaner",
+  },
+  {
+    id: 3,
+    title: "Fault Detection System",
+    category: "Real-time IoT",
+    description: "Real-time fault detection system ensuring safety in industrial environments using advanced sensors.",
+    tags: ["IoT", "Real-time", "C++", "Hardware"],
+    icon: <Cpu />,
+    color: "bg-orange-100",
+    image: imgFault,
+    video: vidFault,
+    github: "https://github.com/yourusername/fault-detection",
   }
+];
+
+const ProjectCard = ({ project, index, targetScale, onOpenVideo }) => {
+  const container = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: container,
+    offset: ['start end', 'start start']
+  });
+
+  const scale = useTransform(scrollYProgress, [0, 1], [1, targetScale]);
 
   return (
-    <div className="text-onSurface text-sm space-y-4">
-      {project.description.map((block, idx) => {
-        if (block.type === "paragraph") {
-          return <p key={idx}>{block.content}</p>;
-        }
-        if (block.type === "section") {
-          return (
-            <div key={idx}>
-              <h4 className="font-semibold text-primary mb-1">{block.title}</h4>
-              {block.items ? (
-                <ul className="list-disc list-inside space-y-1">
-                  {block.items.map((item, i) => (
-                    <li key={i}>{item}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="font-medium">{block.content}</p>
-              )}
-            </div>
-          );
-        }
-        return null;
-      })}
+    // 'sticky top-28' card ko sahi jagah par rokega (Navbar se door)
+    <div ref={container} className="h-screen flex items-center justify-center sticky top-28">
+      <motion.div 
+        style={{ scale, top: `calc(-5vh + ${index * 25}px)` }} 
+        // FIX: 'bg-white' (Solid) taake overlap na ho
+        // FIX: 'relative z-10' taake ye Title ke oopar rahe
+        className="relative z-10 flex flex-col md:flex-row gap-8 w-full max-w-5xl h-[70vh] bg-white border border-white/20 rounded-[40px] p-8 md:p-12 shadow-2xl origin-top"
+      >
+        {/* Left Side: Content */}
+        <div className="w-full md:w-1/2 flex flex-col justify-center gap-6 h-full">
+           
+           <div className="flex flex-col gap-4">
+             <div className="flex items-center gap-3">
+               <span className={`p-3 rounded-full ${project.color} text-onSurface`}>
+                 {project.icon}
+               </span>
+               <span className="text-sm font-bold uppercase tracking-widest text-primary">
+                 {project.category}
+               </span>
+             </div>
+             
+             <h3 className="text-3xl md:text-4xl font-bold text-onSurface leading-tight">
+               {project.title}
+             </h3>
+             
+             <p className="text-lg text-onSurface/70 leading-relaxed line-clamp-3">
+               {project.description}
+             </p>
+             
+             <div className="flex flex-wrap gap-2">
+               {project.tags.map(tag => (
+                 <span key={tag} className="px-3 py-1 bg-surface rounded-full text-xs font-medium border border-primary/10">
+                   {tag}
+                 </span>
+               ))}
+             </div>
+           </div>
+
+           <div className="flex gap-4 mt-2">
+             {project.video ? (
+               <button 
+                 onClick={() => onOpenVideo(project.video)}
+                 className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-full font-bold hover:opacity-90 transition-all hover:scale-105 shadow-lg shadow-primary/30"
+               >
+                 <Play size={20} fill="currentColor" /> Watch Preview
+               </button>
+             ) : (
+               <>
+                 <a href={project.github} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-6 py-3 bg-onSurface text-surface rounded-full font-bold hover:bg-primary transition-colors">
+                   <Github size={20} /> View Code
+                 </a>
+                 <a href="#" className="flex items-center gap-2 px-6 py-3 bg-surface text-onSurface border border-onSurface/10 rounded-full font-bold hover:bg-primary/5 transition-colors">
+                   <ExternalLink size={20} /> Live Demo
+                 </a>
+               </>
+             )}
+           </div>
+        </div>
+
+        {/* Right Side: Image */}
+        <div className="w-full md:w-1/2 h-full rounded-3xl overflow-hidden relative group border border-gray-100 shadow-inner bg-gray-50 flex items-center justify-center">
+          <div className={`absolute inset-0 ${project.color} opacity-20 group-hover:opacity-10 transition-opacity`} />
+          <img 
+            src={project.image} 
+            alt={project.title} 
+            className="w-[90%] h-auto object-contain transform group-hover:scale-105 transition-transform duration-700 drop-shadow-xl"
+            onError={(e) => {e.target.src="https://placehold.co/600x400/21005D/FFFFFF?text=No+Image"}}
+          />
+        </div>
+      </motion.div>
     </div>
   );
 };
 
 export default function Work() {
-  const [selectedProject, setSelectedProject] = useState(null);
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [showAllModal, setShowAllModal] = useState(false);
-  const sliderRef = useRef(null);
+  const container = useRef(null);
+  const [selectedVideo, setSelectedVideo] = useState(null);
 
-  const allCategories = ["All", ...new Set(projects.map((p) => p.category))];
-  const filteredProjects =
-    activeCategory === "All"
-      ? projects
-      : projects.filter((p) => p.category === activeCategory);
-
-  const scrollLeft = () => {
-    if (sliderRef.current) {
-      sliderRef.current.scrollBy({ left: -320, behavior: "smooth" });
-    }
-  };
-
-  const scrollRight = () => {
-    if (sliderRef.current) {
-      sliderRef.current.scrollBy({ left: 320, behavior: "smooth" });
-    }
-  };
+  const { scrollYProgress } = useScroll({
+    target: container,
+    offset: ['start start', 'end end']
+  });
 
   return (
-    <section id="work" className="min-h-[80vh] px-6 py-12 max-w-5xl mx-auto">
-      <h2 className="text-4xl font-bold text-primary mb-10 text-center">Work</h2>
-
-      {/* Category Filter */}
-      <div className="flex flex-wrap justify-center gap-4 mb-10">
-        {allCategories.map((category) => (
-          <button
-            key={category}
-            onClick={() => setActiveCategory(category)}
-            className={`px-4 py-2 rounded-full font-medium border ${
-              activeCategory === category
-                ? "bg-primary text-white"
-                : "bg-surface text-primary border-primary"
-            } transition`}
+    // FIX: 'pt-32' added to push content down from Navbar
+    <section id="work" className="relative pt-32 pb-20" ref={container}>
+      
+      {/* VIDEO MODAL */}
+      <AnimatePresence>
+        {selectedVideo && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => setSelectedVideo(null)}
           >
-            {category}
-          </button>
-        ))}
-      </div>
-
-      {/* Projects Grid */}
-      <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {filteredProjects.slice(0, 3).map((project, i) => (
-          <div
-            key={i}
-            className="relative cursor-pointer rounded-material overflow-hidden shadow-material hover:shadow-lg transition-shadow duration-300 bg-surface group"
-            onClick={() => setSelectedProject(project)}
-          >
-            {/* Image with aspect ratio */}
-            <div className="aspect-[16/9] w-full overflow-hidden bg-muted">
-              <img
-                src={getThumbnail(project)}
-                alt={project.name}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                loading="lazy"
-              />
-            </div>
-
-            {/* Overlay */}
-            <div className="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center items-center rounded-material">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedProject(project);
-                }}
-                className="px-6 py-3 bg-primary text-white font-medium rounded-full shadow-material hover:opacity-90 transition"
-              >
-                View Project
-              </button>
-            </div>
-
-            {/* Text Content */}
-            <div className="p-4 min-h-[100px]">
-              <h3 className="text-xl font-semibold text-primary mb-1">
-                {project.name}
-              </h3>
-              <p className="text-onSurface text-sm">{project.shortDescription}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* View All Button */}
-      {filteredProjects.length > 3 && (
-        <div className="text-center mt-8">
-          <button
-            onClick={() => setShowAllModal(true)}
-            className="px-6 py-2 bg-primary text-white rounded-full font-medium hover:bg-opacity-90 transition"
-          >
-            View All Projects
-          </button>
-        </div>
-      )}
-
-      {/* Modal */}
-      {showAllModal && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-6"
-          onClick={() => setShowAllModal(false)}
-        >
-          <div
-            className="relative bg-surface rounded-material shadow-xl max-w-7xl w-full p-6 pt-6 flex flex-col overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <header className="flex justify-between items-center mb-6">
-              <h3 className="text-3xl font-bold text-primary">All Projects</h3>
-              <button
-                onClick={() => setShowAllModal(false)}
-                className="text-onSurface text-3xl font-bold hover:text-primary transition"
-                aria-label="Close modal"
-              >
-                &times;
-              </button>
-            </header>
-
-            {/* Scrollable Cards */}
-            <div className="relative w-full">
-              <button
-                onClick={scrollLeft}
-                className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 bg-primary text-white rounded-full p-2 shadow-lg hover:bg-primary/80 transition z-10"
-                aria-label="Scroll left"
-              >
-                &#8592;
-              </button>
-
-              <div
-                ref={sliderRef}
-                className="flex overflow-x-auto scrollbar-hide space-x-6 scroll-smooth px-4 snap-x snap-mandatory"
-              >
-                {filteredProjects.map((project, i) => (
-                  <div
-                    key={i}
-                    className="w-[90vw] sm:w-[60vw] md:w-[45vw] lg:w-[320px] flex-shrink-0 bg-surface rounded-material shadow-lg hover:shadow-xl transition-transform duration-300 hover:scale-105 cursor-pointer snap-center"
-                    onClick={() => {
-                      setShowAllModal(false);
-                      setSelectedProject(project);
-                    }}
-                  >
-                    <img
-                      src={getThumbnail(project)}
-                      alt={project.name}
-                      className="w-full h-48 object-cover rounded-t-material bg-muted"
-                      loading="lazy"
-                    />
-                    <div className="p-5 min-h-[100px]">
-                      <h4 className="text-xl font-semibold text-primary mb-2">
-                        {project.name}
-                      </h4>
-                      <p className="text-onSurface text-base">
-                        {project.shortDescription}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <button
-                onClick={scrollRight}
-                className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 bg-primary text-white rounded-full p-2 shadow-lg hover:bg-primary/80 transition z-10"
-                aria-label="Scroll right"
-              >
-                &#8594;
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Project Detail Modal */}
-      {selectedProject && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4"
-          onClick={() => setSelectedProject(null)}
-        >
-          <div
-            className="bg-surface rounded-material shadow-material max-w-lg w-full p-6 relative overflow-hidden max-h-[90vh]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setSelectedProject(null)}
-              className="absolute top-3 right-3 text-onSurface text-xl font-bold hover:text-primary"
-              aria-label="Close"
+            <motion.div 
+              initial={{ scale: 0.8 }} 
+              animate={{ scale: 1 }} 
+              exit={{ scale: 0.8 }}
+              className="relative w-full max-w-4xl bg-black rounded-2xl overflow-hidden shadow-2xl aspect-video"
+              onClick={(e) => e.stopPropagation()} 
             >
-              &times;
-            </button>
-
-            {selectedProject.video ? (
-              <video
-                src={selectedProject.video}
-                controls
-                className="w-full rounded-material mb-4"
+              <button 
+                onClick={() => setSelectedVideo(null)}
+                className="absolute top-4 right-4 z-10 p-2 bg-white/20 backdrop-blur rounded-full text-white hover:bg-white/40 transition"
+              >
+                <X size={24} />
+              </button>
+              <video 
+                src={selectedVideo} 
+                controls 
+                autoPlay 
+                className="w-full h-full object-contain"
               />
-            ) : (
-              <img
-                src={selectedProject.image}
-                alt={selectedProject.name}
-                className="w-full h-64 object-cover rounded-material mb-4 bg-muted"
-                loading="lazy"
-              />
-            )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-            <div className="overflow-y-auto max-h-52 pr-2 scrollbar-hide">
-              <h3 className="text-2xl font-bold text-primary mb-2">
-                {selectedProject.name}
-              </h3>
-              {renderDescription(selectedProject)}
-              <p className="italic text-sm text-onSurface mt-4">
-                Category: {selectedProject.category}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Title - FIX: 'top-32' to clear navbar & 'z-0' to stay behind cards */}
+      <div className="sticky top-32 text-center mb-20 z-0">
+         <h2 className="text-5xl md:text-7xl font-bold text-primary opacity-20 uppercase tracking-tighter">
+           Selected Works
+         </h2>
+      </div>
+
+      {/* Cards Container */}
+      <div className="px-4">
+        {projects.map((project, i) => {
+          const targetScale = 1 - ( (projects.length - i) * 0.05 );
+          return (
+            <ProjectCard 
+              key={project.id} 
+              project={project} 
+              index={i} 
+              targetScale={targetScale} 
+              onOpenVideo={setSelectedVideo}
+            />
+          );
+        })}
+      </div>
     </section>
   );
 }
