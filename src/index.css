@@ -2,21 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  
+  /* Smooth font rendering */
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
-  @apply bg-surface text-onSurface font-sans;
+  @apply bg-surface text-onSurface font-sans selection:bg-primary/30 selection:text-primary;
+  /* 'selection' wala part text select karne par purple highlight dega */
+  overflow-x: hidden; /* Horizontal scroll rokne ke liye */
 }
 
 html {
-  scroll-padding-top: 80px; /* or 80px, adjust if you change navbar height */
   scroll-behavior: smooth;
 }
 
-/* index.css */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+/* --- MODERN CUSTOM SCROLLBAR --- */
+/* Yeh poori website ki scrollbar ko change karega */
+
+/* Chrome, Edge, and Safari */
+::-webkit-scrollbar {
+  width: 10px;
 }
 
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #d0bcff; /* Light purple */
+  border-radius: 20px;
+  border: 3px solid #f1f1f1; /* Padding effect ke liye border */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #6750A4; /* Primary color on hover */
+}
+
+/* --- UTILITIES --- */
+
+/* Utility to hide scrollbar but keep functionality */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Glassmorphism utility class */
+.glass-panel {
+  @apply bg-white/70 backdrop-blur-lg border border-white/20 shadow-glass;
+}
