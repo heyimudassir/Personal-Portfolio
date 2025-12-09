@@ -40,27 +40,32 @@ const testimonials = [
 ];
 
 const TestimonialCard = ({ item }) => (
-  // White Card Design
-  <div className="relative w-[350px] md:w-[450px] bg-white p-8 rounded-[30px] shadow-xl flex-shrink-0 mx-6 border border-gray-100">
+  // FIX 1: 'h-full' aur 'flex flex-col' add kiya taake card poori height le aur content distribute ho
+  <div className="relative w-[300px] md:w-[450px] h-full bg-white p-6 md:p-8 rounded-[30px] shadow-xl flex-shrink-0 mx-4 md:mx-6 border border-gray-100 flex flex-col">
+    
     <Quote className="absolute top-6 right-8 text-primary/10" size={48} />
     
-    <div className="flex gap-1 mb-4">
-      {[...Array(item.stars)].map((_, i) => (
-        <Star key={i} size={18} className="fill-yellow-400 text-yellow-400" />
-      ))}
+    {/* Top Content Wrapper */}
+    <div className="mb-6">
+      <div className="flex gap-1 mb-4">
+        {[...Array(item.stars)].map((_, i) => (
+          <Star key={i} size={18} className="fill-yellow-400 text-yellow-400" />
+        ))}
+      </div>
+
+      <p className="text-base md:text-lg text-gray-700 leading-relaxed font-medium">
+        "{item.text}"
+      </p>
     </div>
 
-    <p className="text-lg text-gray-700 leading-relaxed mb-6 font-medium">
-      "{item.text}"
-    </p>
-
-    <div className="flex items-center gap-3">
+    {/* FIX 2: 'mt-auto' lagaya taake ye hissa hamesha bottom par rahe */}
+    <div className="flex items-center gap-3 mt-auto">
       <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
         {item.name[0]}
       </div>
       <div>
         <h4 className="font-bold text-gray-900">{item.name}</h4>
-        <p className="text-sm text-gray-500 font-medium">{item.role}</p>
+        <p className="text-xs md:text-sm text-gray-500 font-medium">{item.role}</p>
       </div>
     </div>
   </div>
@@ -68,42 +73,37 @@ const TestimonialCard = ({ item }) => (
 
 export default function Testimonials() {
   return (
-    <section id="testimonials" className="py-24 overflow-hidden relative bg-gray-50 rounded-3xl mx-4 md:mx-0">
+    <section id="testimonials" className="py-16 md:py-24 overflow-hidden relative bg-gray-50 rounded-xl-material">
       
-      <div className="text-center mb-16 relative z-10 px-4">
-        <h2 className="text-sm font-bold text-primary tracking-widest uppercase mb-2">
+      <div className="text-center mb-10 relative z-10 px-4">
+        <h2 className="text-xs md:text-sm font-bold text-primary tracking-widest uppercase mb-2">
           Feedback
         </h2>
-        <h3 className="text-4xl md:text-5xl font-bold text-onSurface">
+        <h3 className="text-3xl md:text-5xl font-bold text-onSurface">
           Trusted by Professionals
         </h3>
       </div>
 
-      {/* --- FIX: CSS MASKING (Zero "Box" Feel) --- */}
-      {/* Humne extra DIVs hata diye. Ab hum seedha container ko mask kar rahe hain */}
       <div 
         className="relative w-full flex overflow-hidden"
         style={{
-          // Left 20% fade in (transparent to black)
-          // Right 20% fade out (black to transparent)
-          maskImage: "linear-gradient(to right, transparent, black 20%, black 80%, transparent)",
-          WebkitMaskImage: "linear-gradient(to right, transparent, black 20%, black 80%, transparent)"
+          maskImage: "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
+          WebkitMaskImage: "linear-gradient(to right, transparent, black 15%, black 85%, transparent)"
         }}
       >
-        
-        {/* Moving Track - Padding 'py-12' rakhi hai taake shadow na katay */}
         <motion.div 
-          className="flex items-center py-12"
+          // FIX 3: 'items-center' ko 'items-stretch' se badal diya
+          // Is se sab cards ki height AUTOMATICALLY sab se lambay card jitni ho jayegi
+          className="flex items-stretch py-8 md:py-12"
           animate={{ x: "-50%" }} 
           transition={{ 
             ease: "linear", 
-            duration: 40, 
+            duration: 30, 
             repeat: Infinity,
             repeatType: "loop"
           }}
           whileHover={{ animationPlayState: "paused" }} 
         >
-          {/* List double render for infinite loop */}
           {[...testimonials, ...testimonials].map((item, idx) => (
             <TestimonialCard key={`${item.id}-${idx}`} item={item} />
           ))}

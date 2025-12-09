@@ -1,14 +1,28 @@
 import { motion } from "framer-motion";
 import { Code2, Cpu, MapPin } from "lucide-react";
-// Note: Avatar import hata diya kyunki ab zaroorat nahi
 
+// --- OPTIMIZED BENTO BOX COMPONENT ---
 const BentoBox = ({ children, className, delay = 0 }) => (
   <motion.div
-    initial={{ opacity: 0, y: 20 }}
+    layout // 1. Layout jumps ko khatam karega
+    initial={{ opacity: 0, y: 30 }} // Thoda aur neeche se start hoga
     whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true }}
-    transition={{ duration: 0.5, delay }}
-    whileHover={{ scale: 1.02 }}
+    viewport={{ once: true, margin: "-50px" }} // Thoda jaldi trigger hoga
+    
+    // 2. SOFT SPRING PHYSICS (Makkhan jaisa load)
+    transition={{ 
+      type: "spring", 
+      stiffness: 100, // Jitna kam, utna soft
+      damping: 20,    // Bounciness control
+      delay: delay    // Ek ke baad ek aayenge
+    }}
+    
+    // 3. SNAPPY HOVER (Touch response fast hona chahiye)
+    whileHover={{ 
+      scale: 1.02,
+      transition: { type: "spring", stiffness: 400, damping: 10 }
+    }}
+    
     className={`backdrop-blur-md border border-white/30 rounded-3xl p-6 shadow-lg flex flex-col min-h-[180px] ${className}`}
   >
     {children}
@@ -21,21 +35,18 @@ export default function About() {
       
       <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-3 gap-4 md:gap-6 h-auto md:h-[800px]">
         
-        {/* 1. MAIN INTRO - Expanded to fill the space (md:col-span-3) */}
-        {/* Ab ye box zyada chora hoga aur text clean lagega */}
-        <BentoBox className="md:col-span-3 md:row-span-2 justify-center bg-gradient-to-br from-white/60 to-white/30">
+        {/* 1. MAIN INTRO (Slowest Delay) */}
+        <BentoBox className="md:col-span-3 md:row-span-2 justify-center bg-gradient-to-br from-white/60 to-white/30" delay={0.1}>
           <h2 className="text-3xl md:text-5xl font-bold text-primary mb-4 md:mb-6">
             More than just code.
           </h2>
           <p className="text-base md:text-xl text-onSurface/80 leading-relaxed mb-4 max-w-3xl">
-            I'm <span className="font-bold text-primary">Mudassir</span>, a Software Engineering graduate with 4 years in IoT and desktop apps, plus 1 year in web development.
+            I'm <span className="font-bold text-primary">Mudassir</span>, a Software Engineer bridging the physical and digital worlds.
           </p>
           <p className="text-base md:text-lg text-onSurface/80 leading-relaxed max-w-3xl">
             I excel in professional documentation and have collaborated with international and local clients to build <strong>Smart Systems</strong> that bridge the physical and digital worlds.
           </p>
         </BentoBox>
-
-        {/* --- IMAGE BLOCK REMOVED --- */}
 
         {/* 2. STATS */}
         <BentoBox className="md:col-span-1 md:row-span-1 justify-center items-center bg-primary text-white" delay={0.2}>
@@ -46,7 +57,7 @@ export default function About() {
         {/* 3. LOCATION */}
         <BentoBox className="md:col-span-1 md:row-span-1 justify-center items-center bg-indigo-100" delay={0.3}>
            <MapPin size={40} className="text-primary mb-2 md:mb-2 md:w-12 md:h-12" />
-           <h3 className="font-bold text-lg md:text-xl text-primary">Bahawalnagar</h3>
+           <h3 className="font-bold text-lg md:text-xl text-primary">Lahore</h3>
            <p className="text-sm text-onSurface/60">Pakistan</p>
         </BentoBox>
 

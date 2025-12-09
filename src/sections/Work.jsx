@@ -64,15 +64,14 @@ const ProjectCard = ({ project, index, targetScale, onOpenVideo }) => {
   return (
     <div ref={container} className="h-screen flex items-center justify-center sticky top-20 md:top-28">
       <motion.div 
+      layout
         style={{ scale, top: `calc(-5vh + ${index * 15}px)` }} 
-        // FIX 1: Height 'h-[70vh]' kar di aur overflow hide kar diya
-        className="relative z-10 flex flex-col md:flex-row gap-4 md:gap-8 w-full max-w-5xl h-[70vh] bg-white border border-white/20 rounded-[30px] md:rounded-[40px] p-6 md:p-12 shadow-2xl origin-top overflow-hidden"
+        transition={{ type: "spring", stiffness: 120, damping: 20 }}
+        className="relative z-10 flex flex-col md:flex-row gap-4 md:gap-8 w-full max-w-5xl h-[70vh] bg-white border border-white/20 rounded-[30px] md:rounded-[40px] p-6 md:p-12 shadow-2xl origin-top"
       >
         
-        {/* Left Side: Content (Order 2 on Mobile) */}
-        {/* FIX 2: 'overflow-y-auto' hata diya taake scrollbar na aye */}
+        {/* Left Side: Content */}
         <div className="w-full md:w-1/2 flex flex-col justify-center gap-3 md:gap-6 h-full order-2 md:order-1">
-           
            <div className="flex flex-col gap-2 md:gap-4">
              <div className="flex items-center gap-2 md:gap-3">
                <span className={`p-2 md:p-3 rounded-full ${project.color} text-onSurface`}>
@@ -87,7 +86,6 @@ const ProjectCard = ({ project, index, targetScale, onOpenVideo }) => {
                {project.title}
              </h3>
              
-             {/* FIX 3: 'line-clamp-3' lagaya taake text overflow na kare */}
              <p className="text-sm md:text-lg text-onSurface/70 leading-relaxed line-clamp-3 md:line-clamp-4">
                {project.description}
              </p>
@@ -105,7 +103,7 @@ const ProjectCard = ({ project, index, targetScale, onOpenVideo }) => {
              {project.video ? (
                <button 
                  onClick={() => onOpenVideo(project.video)}
-                 className="flex items-center justify-center gap-2 px-5 py-3 bg-primary text-white rounded-full font-bold hover:bg-primaryDark transition-all active:scale-95 shadow-md text-sm md:text-base w-full md:w-auto"
+                 className="flex items-center justify-center gap-2 px-5 py-3 bg-primary text-white rounded-full font-bold hover:bg-primaryDark transition-all active:scale-95 shadow-md hover:shadow-lg text-sm md:text-base w-full md:w-auto"
                >
                  <Play size={18} fill="currentColor" /> Watch Preview
                </button>
@@ -122,13 +120,14 @@ const ProjectCard = ({ project, index, targetScale, onOpenVideo }) => {
            </div>
         </div>
 
-        {/* Right Side: Image (Order 1 on Mobile) */}
-        {/* FIX 4: Mobile par Image height 'h-32' kar di taake text ke liye jagah bache */}
+        {/* Right Side: Image */}
         <div className="w-full md:w-1/2 h-32 md:h-full rounded-2xl md:rounded-3xl overflow-hidden relative group border border-gray-100 shadow-inner bg-gray-50 flex items-center justify-center order-1 md:order-2 flex-shrink-0">
           <div className={`absolute inset-0 ${project.color} opacity-20`} />
           <img 
             src={project.image} 
             alt={project.title} 
+            loading="lazy" 
+            decoding="async" 
             className="w-auto h-[85%] object-contain drop-shadow-lg transform transition-transform duration-700 md:group-hover:scale-105"
             onError={(e) => {e.target.src="https://placehold.co/600x400/21005D/FFFFFF?text=No+Image"}}
           />
@@ -155,6 +154,7 @@ export default function Work() {
       <AnimatePresence>
         {selectedVideo && (
           <motion.div 
+          layout
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
             exit={{ opacity: 0 }}
@@ -162,9 +162,14 @@ export default function Work() {
             onClick={() => setSelectedVideo(null)}
           >
             <motion.div 
-              initial={{ scale: 0.8 }} 
-              animate={{ scale: 1 }} 
-              exit={{ scale: 0.8 }}
+            layout
+              initial={{ scale: 0.8, opacity: 0 }} 
+              animate={{ scale: 1, opacity: 1 }} 
+              exit={{ scale: 0.8, opacity: 0 }}
+              // --- FIX: ADDED SPRING PHYSICS HERE ---
+              // Ab ye modal "Bounce" karke khulega
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              // --------------------------------------
               className="relative w-full max-w-4xl bg-black rounded-2xl overflow-hidden shadow-2xl aspect-video"
               onClick={(e) => e.stopPropagation()} 
             >
@@ -185,7 +190,7 @@ export default function Work() {
         )}
       </AnimatePresence>
 
-      <div className="sticky top-24 md:top-32 text-center mb-10 md:mb-20 z-0">
+      <div className="absolute top-10 md:top-12 left-0 right-0 text-center z-0">
          <h2 className="text-4xl md:text-7xl font-bold text-primary opacity-20 uppercase tracking-tighter">
            Selected Works
          </h2>

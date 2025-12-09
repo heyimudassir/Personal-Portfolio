@@ -43,15 +43,16 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="py-20 px-4 max-w-6xl mx-auto">
+    <section id="contact" className="py-16 md:py-20 px-4 max-w-6xl mx-auto">
       
       <motion.div 
+      layout
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
-        // FIX: Padding kam ki mobile ke liye (p-8 vs md:p-16)
-        className="bg-primary rounded-[30px] md:rounded-[40px] p-8 md:p-16 shadow-2xl overflow-hidden relative flex flex-col md:flex-row gap-8 md:gap-12"
+        // FIX: Mobile padding 'p-6' kar di (Desktop par p-16)
+        className="bg-primary rounded-[30px] md:rounded-[40px] p-6 md:p-16 shadow-2xl overflow-hidden relative flex flex-col md:flex-row gap-8 md:gap-12"
       >
         
         {/* Background Circles */}
@@ -64,11 +65,10 @@ export default function Contact() {
             <h2 className="text-xs md:text-sm font-bold tracking-widest uppercase opacity-70 mb-2">
               Get in touch
             </h2>
-            {/* FIX: Mobile font size */}
             <h3 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 leading-tight">
               Let's build something <br/> amazing together.
             </h3>
-            <p className="text-base md:text-lg opacity-80 mb-6 md:mb-8 max-w-md">
+            <p className="text-sm md:text-lg opacity-80 mb-6 md:mb-8 max-w-md">
               Have a project in mind? Looking for a partner? 
               Or just want to say hi? I'm always open to discussing new projects.
             </p>
@@ -82,7 +82,7 @@ export default function Contact() {
               <div>
                 <p className="text-xs md:text-sm opacity-60">Email me at</p>
                 <a href="mailto:contact@mudassir.dev" className="font-bold hover:underline text-sm md:text-base">
-                  contact@mudassir.dev
+                  heyimudassir@gmail.com
                 </a>
               </div>
             </div>
@@ -93,11 +93,10 @@ export default function Contact() {
               </div>
               <div>
                 <p className="text-xs md:text-sm opacity-60">Based in</p>
-                <p className="font-bold text-sm md:text-base">Bahawalnagar, Pakistan</p>
+                <p className="font-bold text-sm md:text-base">Lahore, Pakistan</p>
               </div>
             </div>
 
-            {/* Social Icons */}
             <div className="flex gap-4 mt-6 md:mt-8">
               <a href="https://github.com/ohmudassir" target="_blank" rel="noreferrer" className="p-3 bg-white/10 rounded-full hover:bg-white hover:text-primary transition-all">
                 <Github size={20} />
@@ -117,7 +116,7 @@ export default function Contact() {
           <form ref={formRef} onSubmit={sendEmail} className="flex flex-col gap-4 md:gap-6">
             
             <div>
-              <label htmlFor="name" className="block text-sm font-bold text-onSurface/70 mb-2">Name</label>
+              <label htmlFor="name" className="block text-sm font-bold text-onSurface/70 mb-1">Name</label>
               <input 
                 type="text" 
                 id="name"
@@ -129,7 +128,7 @@ export default function Contact() {
             </div>
             
             <div>
-              <label htmlFor="email" className="block text-sm font-bold text-onSurface/70 mb-2">Email</label>
+              <label htmlFor="email" className="block text-sm font-bold text-onSurface/70 mb-1">Email</label>
               <input 
                 type="email" 
                 id="email"
@@ -141,7 +140,7 @@ export default function Contact() {
             </div>
 
             <div>
-              <label htmlFor="message" className="block text-sm font-bold text-onSurface/70 mb-2">Message</label>
+              <label htmlFor="message" className="block text-sm font-bold text-onSurface/70 mb-1">Message</label>
               <textarea 
                 id="message"
                 name="message"
@@ -155,7 +154,7 @@ export default function Contact() {
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full py-4 bg-primary text-white font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/30 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full py-3.5 bg-primary text-white font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/30 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>

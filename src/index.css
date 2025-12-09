@@ -35,30 +35,30 @@ html {
 }
 
 /* --- PERFORMANCE CLASS --- */
-/* Is class ko hum elements par use kar sakte hain taake wo CPU ki jagah GPU use karein */
 .framer-motion-div {
   will-change: transform, opacity;
   transform: translateZ(0);
 }
 
-/* --- MODERN CUSTOM SCROLLBAR --- */
-/* Chrome, Edge, and Safari */
-::-webkit-scrollbar {
-  width: 10px;
-}
+/* --- MODERN CUSTOM SCROLLBAR (Desktop Only) --- */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
 
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
 
-::-webkit-scrollbar-thumb {
-  background-color: #d0bcff; 
-  border-radius: 20px;
-  border: 3px solid #f1f1f1; 
-}
+  ::-webkit-scrollbar-thumb {
+    background-color: #d0bcff; 
+    border-radius: 20px;
+    border: 3px solid #f1f1f1; 
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background-color: #6750A4; 
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #6750A4; 
+  }
 }
 
 /* --- UTILITIES --- */
@@ -73,4 +73,39 @@ html {
 
 .glass-panel {
   @apply bg-white/70 backdrop-blur-lg border border-white/20 shadow-glass;
+}
+
+/* --- MOBILE SPECIFIC GPU HACKS & UI FIXES --- */
+@media (max-width: 768px) {
+  
+  /* 1. Heavy Blur ko zabardasti kam karna taake phone slow na ho */
+  .backdrop-blur-xl, 
+  .backdrop-blur-lg, 
+  .backdrop-blur-md {
+    backdrop-filter: blur(5px) !important;
+    -webkit-backdrop-filter: blur(5px) !important;
+  }
+
+  /* 2. Animations ko smooth rakhne ke liye */
+  * {
+    -webkit-font-smoothing: antialiased;
+  }
+  
+  /* 3. Scroll performance boost */
+  body {
+    touch-action: pan-y;
+  }
+
+  /* 4. TEXT SELECTION BAND KARNA (App-like feel) */
+  /* Headings, Buttons, Links, aur Images select nahi honge */
+  h1, h2, h3, h4, h5, h6, button, a, img, p, span {
+    -webkit-user-select: none; /* Safari/Chrome */
+    user-select: none;
+  }
+
+  /* Sirf Paragraphs ko select hone dena (taake koi copy karna chahe to kar sake) */
+  p {
+    -webkit-user-select: text;
+    user-select: text;
+  }
 }
