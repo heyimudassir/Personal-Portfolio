@@ -1,45 +1,21 @@
-import Github from 'lucide-react/dist/esm/icons/github';
-import Twitter from 'lucide-react/dist/esm/icons/twitter';
-import Mail from 'lucide-react/dist/esm/icons/mail';
+import { Heart } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-surface text-onSurface border-t border-white/10 py-10 mt-24">
-      <div className="max-w-6xl mx-auto px-4 md:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+    <footer className="py-8 text-center">
+      <div className="flex flex-col items-center justify-center gap-2">
         
-        {/* Copyright */}
-        <p className="text-sm text-onSurface/60 text-center md:text-left">
-          © 2025 Mudassir. All rights reserved.
-        </p>
-
-        {/* Social Icons */}
-        <div className="flex gap-4">
-          <a
-            href="https://github.com/ohmudassir"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group p-2 rounded-full hover:bg-primary/10 transition"
-            aria-label="GitHub"
-          >
-            <Github className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
-          </a>
-          <a
-            href="https://x.com/heyimudassir"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group p-2 rounded-full hover:bg-primary/10 transition"
-            aria-label="Twitter"
-          >
-            <Twitter className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
-          </a>
-          <a
-            href="mailto:heyimudassir@gmail.com"
-            className="group p-2 rounded-full hover:bg-primary/10 transition"
-            aria-label="Email"
-          >
-            <Mail className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
-          </a>
+        {/* Animated Line */}
+        <div className="flex items-center gap-2 text-onSurface/60 text-sm font-medium">
+          <span>Designed & Built with</span>
+          <Heart size={16} className="text-red-500 fill-red-500 animate-pulse" />
+          <span>by <span className="text-primary font-bold">Mudassir Nadeem</span></span>
         </div>
+
+        {/* Copyright */}
+        <p className="text-onSurface/40 text-xs">
+          &copy; {new Date().getFullYear()} All rights reserved.
+        </p>
       </div>
     </footer>
   );

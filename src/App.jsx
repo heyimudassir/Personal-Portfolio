@@ -1,36 +1,42 @@
-import { useState } from "react"; // 1. useState import kiya gaya
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-import Home from "./sections/Home";
-import About from "./sections/About";
-import Work from "./sections/Work";
-import Testimonials from "./sections/Testimonials";
-import Contact from "./sections/Contact";
-import BackToTop from "./components/BackToTop";
-// 2. Naya Modal component import kiya (hum isay 'sections' folder mein banayenge)
-import LogbookModal from "./sections/LogbookModal";
+import { useState } from 'react';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import BackToTop from './components/BackToTop';
+import LogbookModal from './sections/LogbookModal';
+
+// Sections
+import Home from './sections/Home';
+import About from './sections/About';
+import Work from './sections/Work';
+import Testimonials from './sections/Testimonials';
+import Contact from './sections/Contact';
 
 export default function App() {
-  // 3. State add ki gayi jo modal ko control karegi
   const [isLogbookOpen, setIsLogbookOpen] = useState(false);
 
-  // 4. Modal kholne aur band karne ke functions
   const openLogbook = () => setIsLogbookOpen(true);
   const closeLogbook = () => setIsLogbookOpen(false);
 
   return (
-    <div className="bg-surface min-h-screen px-4 md:px-8 py-6">
-      {/* 5. Navbar ab tabhi show hogi jab modal band hoga */}     {" "}
+    // 'bg-surface' humari tailwind config se aa raha hai
+    <div className="bg-surface min-h-screen relative selection:bg-primary/30">
+      
+      {/* Jab modal khula ho to Navbar chupa dein */}
       {!isLogbookOpen && <Navbar />}
-      {/* 6. 'openLogbook' function ko 'Home' component mein pass kiya gaya */}
-            <Home onOpenLogbook={openLogbook} />
-            <About />
-            <Work />
-            <Testimonials />
-            <Contact />
-            <Footer />
-            <BackToTop />
-      {/* 7. Jab state 'true' hogi, to LogbookModal show hoga */}
+
+      <main>
+        {/* Pass 'isPaused' to Home to stop parallax when modal is open */}
+        <Home onOpenLogbook={openLogbook} isPaused={isLogbookOpen} />
+        <About />
+        <Work />
+        <Testimonials />
+        <Contact />
+      </main>
+
+      <Footer />
+      <BackToTop />
+
+      {/* Modal */}
       {isLogbookOpen && <LogbookModal onClose={closeLogbook} />}
     </div>
   );

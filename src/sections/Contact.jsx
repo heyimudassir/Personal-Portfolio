@@ -1,8 +1,8 @@
 import { useRef, useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Mail, MapPin, Send, Github, Linkedin, Twitter, Loader2 } from "lucide-react";
 import emailjs from "@emailjs/browser";
-import FadeInSection from "../components/FadeInSection";
 import toast from "react-hot-toast";
-import { Loader2 } from "lucide-react"; // Optional spinner icon
 
 export default function Contact() {
   const formRef = useRef();
@@ -22,10 +22,10 @@ export default function Contact() {
 
     emailjs
       .sendForm(
-        "service_q4oluml",
-        "template_qunr7lw",
+        "service_q4oluml", 
+        "template_qunr7lw", 
         formRef.current,
-        "kPMWrvFBajZBt0sl-"
+        "kPMWrvFBajZBt0sl-" 
       )
       .then(
         () => {
@@ -43,71 +43,134 @@ export default function Contact() {
   };
 
   return (
-    <FadeInSection>
-      <section
-        id="contact"
-        className="max-w-3xl mx-auto py-16 px-6 scroll-mt-20 animate-appear"
-        aria-label="Contact Section"
+    <section id="contact" className="py-20 px-4 max-w-6xl mx-auto">
+      
+      <motion.div 
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        // FIX: Padding kam ki mobile ke liye (p-8 vs md:p-16)
+        className="bg-primary rounded-[30px] md:rounded-[40px] p-8 md:p-16 shadow-2xl overflow-hidden relative flex flex-col md:flex-row gap-8 md:gap-12"
       >
-        <h2 className="text-4xl font-bold text-primary mb-10 text-center">Contact</h2>
+        
+        {/* Background Circles */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
-        <form ref={formRef} onSubmit={sendEmail} className="space-y-8">
-          {/* Name Field */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="name" className="text-sm font-medium text-onSurface">
-              Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              required
-              placeholder="John Doe"
-              className="bg-surface text-onSurface placeholder-onSurface/50 px-5 py-3 rounded-2xl shadow-md border border-onSurface/10 focus:outline-none focus:ring-2 focus:ring-primary transition"
-            />
+        {/* --- LEFT SIDE: INFO --- */}
+        <div className="w-full md:w-1/2 flex flex-col justify-between z-10 text-white">
+          <div>
+            <h2 className="text-xs md:text-sm font-bold tracking-widest uppercase opacity-70 mb-2">
+              Get in touch
+            </h2>
+            {/* FIX: Mobile font size */}
+            <h3 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 leading-tight">
+              Let's build something <br/> amazing together.
+            </h3>
+            <p className="text-base md:text-lg opacity-80 mb-6 md:mb-8 max-w-md">
+              Have a project in mind? Looking for a partner? 
+              Or just want to say hi? I'm always open to discussing new projects.
+            </p>
           </div>
 
-          {/* Email Field */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="email" className="text-sm font-medium text-onSurface">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              required
-              placeholder="you@example.com"
-              className="bg-surface text-onSurface placeholder-onSurface/50 px-5 py-3 rounded-2xl shadow-md border border-onSurface/10 focus:outline-none focus:ring-2 focus:ring-primary transition"
-            />
-          </div>
+          <div className="space-y-4 md:space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-white/10 rounded-full">
+                <Mail size={20} className="md:w-6 md:h-6" />
+              </div>
+              <div>
+                <p className="text-xs md:text-sm opacity-60">Email me at</p>
+                <a href="mailto:contact@mudassir.dev" className="font-bold hover:underline text-sm md:text-base">
+                  contact@mudassir.dev
+                </a>
+              </div>
+            </div>
 
-          {/* Message Field */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="message" className="text-sm font-medium text-onSurface">
-              Message
-            </label>
-            <textarea
-              id="message"
-              name="message"
-              rows="5"
-              required
-              placeholder="Write your message here..."
-              className="bg-surface text-onSurface placeholder-onSurface/50 px-5 py-3 rounded-2xl shadow-md border border-onSurface/10 focus:outline-none focus:ring-2 focus:ring-primary transition resize-none"
-            ></textarea>
-          </div>
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-white/10 rounded-full">
+                <MapPin size={20} className="md:w-6 md:h-6" />
+              </div>
+              <div>
+                <p className="text-xs md:text-sm opacity-60">Based in</p>
+                <p className="font-bold text-sm md:text-base">Bahawalnagar, Pakistan</p>
+              </div>
+            </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex items-center justify-center gap-2 bg-[#F0ECF6] text-[#7661AD] px-6 py-3 rounded-material hover:bg-[#e3dced] transition-colors font-semibold shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {loading && <Loader2 className="animate-spin w-4 h-4" />}
-            {loading ? "Sending..." : "Send Message"}
-          </button>
-        </form>
-      </section>
-    </FadeInSection>
+            {/* Social Icons */}
+            <div className="flex gap-4 mt-6 md:mt-8">
+              <a href="https://github.com/ohmudassir" target="_blank" rel="noreferrer" className="p-3 bg-white/10 rounded-full hover:bg-white hover:text-primary transition-all">
+                <Github size={20} />
+              </a>
+              <a href="https://www.linkedin.com/in/heyimudassir/" target="_blank" rel="noreferrer" className="p-3 bg-white/10 rounded-full hover:bg-white hover:text-primary transition-all">
+                <Linkedin size={20} />
+              </a>
+              <a href="https://twitter.com/heyimudassir" target="_blank" rel="noreferrer" className="p-3 bg-white/10 rounded-full hover:bg-white hover:text-primary transition-all">
+                <Twitter size={20} />
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* --- RIGHT SIDE: FORM --- */}
+        <div className="w-full md:w-1/2 bg-white rounded-3xl p-6 md:p-8 text-onSurface z-10 shadow-lg">
+          <form ref={formRef} onSubmit={sendEmail} className="flex flex-col gap-4 md:gap-6">
+            
+            <div>
+              <label htmlFor="name" className="block text-sm font-bold text-onSurface/70 mb-2">Name</label>
+              <input 
+                type="text" 
+                id="name"
+                name="name"
+                required
+                placeholder="John Doe" 
+                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="email" className="block text-sm font-bold text-onSurface/70 mb-2">Email</label>
+              <input 
+                type="email" 
+                id="email"
+                name="email"
+                required
+                placeholder="john@example.com" 
+                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="message" className="block text-sm font-bold text-onSurface/70 mb-2">Message</label>
+              <textarea 
+                id="message"
+                name="message"
+                required
+                rows="4" 
+                placeholder="Tell me about your project..." 
+                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none"
+              ></textarea>
+            </div>
+
+            <button 
+              type="submit" 
+              disabled={loading}
+              className="w-full py-4 bg-primary text-white font-bold rounded-xl hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/30 disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin" size={20} /> Sending...
+                </>
+              ) : (
+                <>
+                  <Send size={20} /> Send Message
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+
+      </motion.div>
+    </section>
   );
 }

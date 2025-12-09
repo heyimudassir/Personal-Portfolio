@@ -16,17 +16,32 @@
 
 body {
   @apply bg-surface text-onSurface font-sans selection:bg-primary/30 selection:text-primary;
-  /* 'selection' wala part text select karne par purple highlight dega */
-  overflow-x: hidden; /* Horizontal scroll rokne ke liye */
+  
+  /* --- MOBILE OPTIMIZATIONS START --- */
+  
+  /* 1. Horizontal scroll ko rokna */
+  overflow-x: hidden;
+  width: 100%;
+  
+  /* 2. Mobile par 'Pull to Refresh' wala bounce effect rokna */
+  overscroll-behavior-y: none;
+  
+  /* 3. Mobile par tap karne par aane wala Blue Box hatana */
+  -webkit-tap-highlight-color: transparent;
 }
 
 html {
   scroll-behavior: smooth;
 }
 
-/* --- MODERN CUSTOM SCROLLBAR --- */
-/* Yeh poori website ki scrollbar ko change karega */
+/* --- PERFORMANCE CLASS --- */
+/* Is class ko hum elements par use kar sakte hain taake wo CPU ki jagah GPU use karein */
+.framer-motion-div {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
 
+/* --- MODERN CUSTOM SCROLLBAR --- */
 /* Chrome, Edge, and Safari */
 ::-webkit-scrollbar {
   width: 10px;
@@ -37,18 +52,17 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #d0bcff; /* Light purple */
+  background-color: #d0bcff; 
   border-radius: 20px;
-  border: 3px solid #f1f1f1; /* Padding effect ke liye border */
+  border: 3px solid #f1f1f1; 
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #6750A4; /* Primary color on hover */
+  background-color: #6750A4; 
 }
 
 /* --- UTILITIES --- */
 
-/* Utility to hide scrollbar but keep functionality */
 .scrollbar-hide::-webkit-scrollbar {
     display: none;
 }
@@ -57,7 +71,6 @@ html {
     scrollbar-width: none;
 }
 
-/* Glassmorphism utility class */
 .glass-panel {
   @apply bg-white/70 backdrop-blur-lg border border-white/20 shadow-glass;
 }
