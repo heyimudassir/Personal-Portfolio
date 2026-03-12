@@ -51,7 +51,7 @@ const projects = [
   }
 ];
 
-// --- SINGLE CARD COMPONENT ---
+// --- SINGLE CARD COMPONENT (Optimized) ---
 const ProjectCard = ({ project, index, targetScale, onOpenVideo }) => {
   const container = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -59,15 +59,15 @@ const ProjectCard = ({ project, index, targetScale, onOpenVideo }) => {
     offset: ['start end', 'start start']
   });
 
+  // Card ki scaling ab directly scroll par depend karti hai, GPU render ke liye will-change-transform add kiya gaya hai
   const scale = useTransform(scrollYProgress, [0, 1], [1, targetScale]);
 
   return (
     <div ref={container} className="h-screen flex items-center justify-center sticky top-20 md:top-28">
       <motion.div 
-      layout
         style={{ scale, top: `calc(-5vh + ${index * 15}px)` }} 
-        transition={{ type: "spring", stiffness: 120, damping: 20 }}
-        className="relative z-10 flex flex-col md:flex-row gap-4 md:gap-8 w-full max-w-5xl h-[70vh] bg-white border border-white/20 rounded-[30px] md:rounded-[40px] p-6 md:p-12 shadow-2xl origin-top"
+        // Removed heavy 'layout' and 'spring' transition to prevent stuttering
+        className="relative z-10 flex flex-col md:flex-row gap-4 md:gap-8 w-full max-w-5xl h-[70vh] bg-white border border-white/20 rounded-[30px] md:rounded-[40px] p-6 md:p-12 shadow-2xl origin-top will-change-transform"
       >
         
         {/* Left Side: Content */}
@@ -142,35 +142,27 @@ export default function Work() {
   const container = useRef(null);
   const [selectedVideo, setSelectedVideo] = useState(null);
 
-  const { scrollYProgress } = useScroll({
-    target: container,
-    offset: ['start start', 'end end']
-  });
-
   return (
     <section id="work" className="relative pt-24 md:pt-32 pb-20" ref={container}>
       
-      {/* VIDEO MODAL */}
+      {/* OPTIMIZED VIDEO MODAL */}
       <AnimatePresence>
         {selectedVideo && (
           <motion.div 
-          layout
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 will-change-transform"
             onClick={() => setSelectedVideo(null)}
           >
             <motion.div 
-            layout
-              initial={{ scale: 0.8, opacity: 0 }} 
+              // Removed layout and spring physics. Switched to smooth, performant ease out.
+              initial={{ scale: 0.95, opacity: 0 }} 
               animate={{ scale: 1, opacity: 1 }} 
-              exit={{ scale: 0.8, opacity: 0 }}
-              // --- FIX: ADDED SPRING PHYSICS HERE ---
-              // Ab ye modal "Bounce" karke khulega
-              transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              // --------------------------------------
-              className="relative w-full max-w-4xl bg-black rounded-2xl overflow-hidden shadow-2xl aspect-video"
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="relative w-full max-w-4xl bg-black rounded-2xl overflow-hidden shadow-2xl aspect-video will-change-transform"
               onClick={(e) => e.stopPropagation()} 
             >
               <button 

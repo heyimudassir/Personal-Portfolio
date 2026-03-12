@@ -1,17 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import clsx from "clsx";
+import { ChevronDown } from "lucide-react"; 
 import avatar from "../assets/profile.jpg"; 
 import FadeInSection from "../components/FadeInSection"; 
 import ParallaxText from "../components/ParallaxText";
 
+// Apple-style ultra smooth ease curve
+const smoothEase = [0.16, 1, 0.3, 1];
+
 export default function Home({ onOpenLogbook, isPaused }) {
   const [fade, setFade] = useState(false);
-
-  // Refs
-  const fadeTimerRef = useRef(null);
-  const nextCycleTimerRef = useRef(null);
-  const isHiddenRef = useRef(document.hidden);
   const isPausedRef = useRef(isPaused); 
 
   useEffect(() => {
@@ -29,7 +27,7 @@ export default function Home({ onOpenLogbook, isPaused }) {
     <FadeInSection>
       <section
         id="home"
-        className="relative min-h-[100dvh] flex flex-col justify-center items-center text-center px-4 overflow-hidden pt-28 md:pt-38 pb-10 md:pb-0"
+        className="relative min-h-[100vh] flex flex-col justify-center items-center text-center px-4 overflow-hidden pt-28 md:pt-38 pb-10 md:pb-0"
       >
         
         {/* BACKGROUND */}
@@ -46,13 +44,12 @@ export default function Home({ onOpenLogbook, isPaused }) {
           
           {/* Avatar */}
           <motion.div
-          layout
-            initial={{ scale: 0, opacity: 0 }}
+            initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5, ease: "backOut" }}
-            className="relative mb-6"
+            transition={{ duration: 0.8, ease: smoothEase }}
+            className="relative mb-6 transform-gpu will-change-transform"
           >
-             <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
+             <div className="absolute inset-0 bg-primary/20 blur-2xl md:blur-3xl rounded-full transform-gpu" />
              <img
               src={avatar}
               alt="Mudassir"
@@ -62,37 +59,31 @@ export default function Home({ onOpenLogbook, isPaused }) {
             />
           </motion.div>
           
-          {/* --- FIX START: NAME CENTERED, EMOJI ABSOLUTE --- */}
-          {/* 'w-fit mx-auto' ensure karta hai ke box sirf text jitna ho aur center mein ho */}
           <div className="relative w-fit mx-auto mb-4">
             <motion.h1 
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="text-5xl md:text-8xl font-bold text-primary tracking-tight"
+              transition={{ delay: 0.1, duration: 0.6, ease: smoothEase }}
+              className="text-5xl md:text-8xl font-bold text-primary tracking-tight will-change-transform"
             >
               Mudassir
             </motion.h1>
             
             <motion.span 
-              initial={{ rotate: -20, scale: 0 }}
-              animate={{ rotate: 0, scale: 1 }}
-              transition={{ delay: 0.3 }}
-              // 'absolute left-full' emoji ko text ke khatam hone ke baad place karega
-              // 'ml-4' thoda gap dega
-              className="absolute top-2 md:top-4 left-full ml-3 md:ml-5 text-4xl md:text-6xl origin-bottom-left"
+              initial={{ rotate: -20, scale: 0.5, opacity: 0 }}
+              animate={{ rotate: 0, scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.6, ease: smoothEase }}
+              className="absolute top-2 md:top-4 left-full ml-3 md:ml-5 text-4xl md:text-6xl origin-bottom-left will-change-transform"
             >
               👋
             </motion.span>
           </div>
-          {/* --- FIX END --- */}
 
-          {/* Subtitle */}
           <motion.h2 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="text-lg md:text-2xl font-medium text-onSurface/80 max-w-lg mx-auto leading-relaxed px-2"
+            transition={{ delay: 0.2, duration: 0.6, ease: smoothEase }}
+            className="text-lg md:text-2xl font-medium text-onSurface/80 max-w-lg mx-auto leading-relaxed px-2 will-change-transform"
           >
             Building modern solutions with <br className="hidden md:block" />
             <span className="text-primary font-bold">Internet of Things</span> & <span className="text-primary font-bold">React</span>
@@ -100,11 +91,10 @@ export default function Home({ onOpenLogbook, isPaused }) {
 
           {/* Buttons */}
           <motion.div 
-          layout
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4 mt-8"
+            transition={{ delay: 0.3, duration: 0.6, ease: smoothEase }}
+            className="flex flex-col sm:flex-row gap-4 mt-8 will-change-transform"
           >
             <a
               href="/MudassirNadeem.pdf"
@@ -122,8 +112,27 @@ export default function Home({ onOpenLogbook, isPaused }) {
               View Work Log
             </button>
           </motion.div>
-
         </div>
+
+        {/* --- MOBILE-ONLY SCROLL INDICATOR --- */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2, duration: 1 }} 
+          // 'md:hidden' ensures this only shows on mobile
+          className="md:hidden absolute bottom-24 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center gap-2 z-20 pointer-events-none"
+        >
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/40">
+            Scroll
+          </span>
+          <motion.div
+            animate={{ y: [0, 8, 0] }} 
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <ChevronDown className="text-primary/40" size={24} />
+          </motion.div>
+        </motion.div>
+
       </section>
     </FadeInSection>
   );

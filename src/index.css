@@ -17,21 +17,24 @@
 body {
   @apply bg-surface text-onSurface font-sans selection:bg-primary/30 selection:text-primary;
   
-  /* --- MOBILE OPTIMIZATIONS START --- */
-  
-  /* 1. Horizontal scroll ko rokna */
+  /* Horizontal scroll ko rokna */
   overflow-x: hidden;
   width: 100%;
   
-  /* 2. Mobile par 'Pull to Refresh' wala bounce effect rokna */
+  /* Mobile par 'Pull to Refresh' wala bounce effect rokna */
   overscroll-behavior-y: none;
-  
-  /* 3. Mobile par tap karne par aane wala Blue Box hatana */
-  -webkit-tap-highlight-color: transparent;
 }
 
-html {
-  scroll-behavior: smooth;
+/* --- NATIVE SMOOTH SCROLL (Crucial for Mobile when Lenis is disabled) --- */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Mobile par tap karne par aane wala Blue Box hatana */
+* {
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* --- PERFORMANCE CLASS --- */
@@ -62,7 +65,6 @@ html {
 }
 
 /* --- UTILITIES --- */
-
 .scrollbar-hide::-webkit-scrollbar {
     display: none;
 }
@@ -78,7 +80,7 @@ html {
 /* --- MOBILE SPECIFIC GPU HACKS & UI FIXES --- */
 @media (max-width: 768px) {
   
-  /* 1. Heavy Blur ko zabardasti kam karna taake phone slow na ho */
+  /* Heavy Blur ko zabardasti kam karna taake phone slow na ho */
   .backdrop-blur-xl, 
   .backdrop-blur-lg, 
   .backdrop-blur-md {
@@ -86,24 +88,23 @@ html {
     -webkit-backdrop-filter: blur(5px) !important;
   }
 
-  /* 2. Animations ko smooth rakhne ke liye */
+  /* Animations ko smooth rakhne ke liye */
   * {
     -webkit-font-smoothing: antialiased;
   }
   
-  /* 3. Scroll performance boost */
+  /* Scroll performance boost */
   body {
     touch-action: pan-y;
   }
 
-  /* 4. TEXT SELECTION BAND KARNA (App-like feel) */
-  /* Headings, Buttons, Links, aur Images select nahi honge */
+  /* TEXT SELECTION BAND KARNA (App-like feel) */
   h1, h2, h3, h4, h5, h6, button, a, img, p, span {
-    -webkit-user-select: none; /* Safari/Chrome */
+    -webkit-user-select: none; 
     user-select: none;
   }
 
-  /* Sirf Paragraphs ko select hone dena (taake koi copy karna chahe to kar sake) */
+  /* Sirf Paragraphs ko select hone dena */
   p {
     -webkit-user-select: text;
     user-select: text;

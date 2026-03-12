@@ -40,12 +40,10 @@ const testimonials = [
 ];
 
 const TestimonialCard = ({ item }) => (
-  // FIX 1: 'h-full' aur 'flex flex-col' add kiya taake card poori height le aur content distribute ho
-  <div className="relative w-[300px] md:w-[450px] h-full bg-white p-6 md:p-8 rounded-[30px] shadow-xl flex-shrink-0 mx-4 md:mx-6 border border-gray-100 flex flex-col">
+  <div className="relative w-[300px] md:w-[450px] h-full bg-white p-6 md:p-8 rounded-[30px] shadow-xl flex-shrink-0 mx-4 md:mx-6 border border-gray-100 flex flex-col transform-gpu">
     
     <Quote className="absolute top-6 right-8 text-primary/10" size={48} />
     
-    {/* Top Content Wrapper */}
     <div className="mb-6">
       <div className="flex gap-1 mb-4">
         {[...Array(item.stars)].map((_, i) => (
@@ -58,7 +56,6 @@ const TestimonialCard = ({ item }) => (
       </p>
     </div>
 
-    {/* FIX 2: 'mt-auto' lagaya taake ye hissa hamesha bottom par rahe */}
     <div className="flex items-center gap-3 mt-auto">
       <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
         {item.name[0]}
@@ -92,9 +89,8 @@ export default function Testimonials() {
         }}
       >
         <motion.div 
-          // FIX 3: 'items-center' ko 'items-stretch' se badal diya
-          // Is se sab cards ki height AUTOMATICALLY sab se lambay card jitni ho jayegi
-          className="flex items-stretch py-8 md:py-12"
+          // FIX: Added hardware acceleration classes to force GPU rendering for continuous animation
+          className="flex items-stretch py-8 md:py-12 transform-gpu will-change-transform"
           animate={{ x: "-50%" }} 
           transition={{ 
             ease: "linear", 

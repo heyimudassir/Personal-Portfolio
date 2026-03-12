@@ -1,13 +1,19 @@
 import { useRef, useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { Mail, MapPin, Send, Github, Linkedin, Twitter, Loader2 } from "lucide-react";
 import emailjs from "@emailjs/browser";
 import toast from "react-hot-toast";
 
+const smoothEase = [0.16, 1, 0.3, 1];
+
 export default function Contact() {
   const formRef = useRef();
+  const containerRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+
+  // Strictly trigger ONCE on scroll
+  const isInView = useInView(containerRef, { once: true, margin: "0px" });
 
   useEffect(() => {
     if (sent) {
@@ -46,18 +52,17 @@ export default function Contact() {
     <section id="contact" className="py-16 md:py-20 px-4 max-w-6xl mx-auto">
       
       <motion.div 
-      layout
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        // FIX: Mobile padding 'p-6' kar di (Desktop par p-16)
-        className="bg-primary rounded-[30px] md:rounded-[40px] p-6 md:p-16 shadow-2xl overflow-hidden relative flex flex-col md:flex-row gap-8 md:gap-12"
+        ref={containerRef}
+        // FIX: Removed 'layout' prop, added transform-gpu and will-change-transform
+        initial={{ opacity: 0, y: 30 }}
+        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+        transition={{ duration: 0.5, ease: smoothEase }}
+        className="bg-primary rounded-[30px] md:rounded-[40px] p-6 md:p-16 shadow-2xl overflow-hidden relative flex flex-col md:flex-row gap-8 md:gap-12 transform-gpu will-change-transform"
       >
         
-        {/* Background Circles */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+        {/* Background Circles - Optimized blur for mobile (blur-2xl instead of blur-3xl) */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-2xl md:blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none transform-gpu" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-2xl md:blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none transform-gpu" />
 
         {/* --- LEFT SIDE: INFO --- */}
         <div className="w-full md:w-1/2 flex flex-col justify-between z-10 text-white">
@@ -81,7 +86,7 @@ export default function Contact() {
               </div>
               <div>
                 <p className="text-xs md:text-sm opacity-60">Email me at</p>
-                <a href="mailto:contact@mudassir.dev" className="font-bold hover:underline text-sm md:text-base">
+                <a href="mailto:heyimudassir@gmail.com" className="font-bold hover:underline text-sm md:text-base">
                   heyimudassir@gmail.com
                 </a>
               </div>

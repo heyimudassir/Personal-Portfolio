@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 
 const navItems = [
   { name: "Home", href: "#home" },
@@ -14,42 +14,64 @@ export default function Navbar() {
   const [active, setActive] = useState("#home");
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false); // New state to hide/show navbar
 
+  // --- SMART SCROLL LOGIC ---
+  const { scrollY } = useScroll();
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const previous = scrollY.getPrevious();
+    
+    // Background blur active check (50px se neechay aane par)
+    if (latest > 50) setScrolled(true);
+    else setScrolled(false);
+
+    // Navbar hide/show logic (agar menu khula hai toh hide nahi karna)
+    if (!open) {
+      if (latest > previous && latest > 150) {
+        setHidden(true); // Scroll down -> Hide
+      } else {
+        setHidden(false); // Scroll up -> Show
+      }
+    }
+  });
+
+  // --- ACTIVE LINK TRACKER (Fixed for Home detection) ---
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+    const handleScrollManual = () => {
+      // Agar user bilkul top par hai (e.g., < 100px), toh Home ko active rakho
+      if (window.scrollY < 100) {
+        setActive("#home");
+      }
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
-  useEffect(() => {
-    const sections = navItems.map((item) =>
-      document.querySelector(item.href)
-    );
+    const sections = navItems.map((item) => document.querySelector(item.href));
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
+          // Home ke ilawa baqi sections ke liye observer kaam karega
+          if (entry.isIntersecting && window.scrollY >= 100) {
             setActive(`#${entry.target.id}`);
           }
         });
       },
-      {
-        rootMargin: "-50% 0px -50% 0px",
-        threshold: 0,
-      }
+      // Margin ko thora adjust kiya taake detection center mein ho
+      { rootMargin: "-30% 0px -30% 0px", threshold: 0 }
     );
 
     sections.forEach((section) => {
       if (section) observer.observe(section);
     });
 
+    // Manual scroll listener for Home section
+    window.addEventListener("scroll", handleScrollManual);
+
     return () => {
       sections.forEach((section) => {
         if (section) observer.unobserve(section);
       });
+      window.removeEventListener("scroll", handleScrollManual);
     };
   }, []);
 
@@ -60,10 +82,15 @@ export default function Navbar() {
 
   return (
     <motion.nav
-      initial={{ y: -100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.8, ease: "easeOut" }}
-      className={`fixed top-4 left-0 right-0 z-50 mx-auto w-[95%] max-w-4xl transition-all duration-300 ${
+      // --- SMART ANIMATION ---
+      variants={{
+        visible: { y: 0, opacity: 1 },
+        hidden: { y: -100, opacity: 0 } // Upar slide ho jayega
+      }}
+      initial="visible"
+      animate={hidden ? "hidden" : "visible"}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
+      className={`fixed top-4 left-0 right-0 z-50 mx-auto w-[95%] max-w-4xl transition-colors duration-300 ${
         scrolled
           ? "bg-white/70 backdrop-blur-xl border border-white/40 shadow-lg shadow-black/5"
           : "bg-white/50 backdrop-blur-md border border-white/20"
@@ -71,7 +98,7 @@ export default function Navbar() {
     >
       <div className="flex justify-between items-center">
         
-        {/* --- LOGO UPDATED --- */}
+        {/* LOGO */}
         <a href="#home" className="text-xl font-bold text-primary tracking-tight">
           heyimudassir
         </a>
@@ -110,7 +137,7 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Dropdown */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -118,7 +145,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-16 left-0 right-0 bg-white/90 backdrop-blur-xl border border-white/40 rounded-3xl shadow-2xl p-4 mx-2 overflow-hidden"
+            className="absolute top-16 left-0 right-0 bg-white/95 backdrop-blur-xl border border-white/40 rounded-3xl shadow-2xl p-4 mx-2 overflow-hidden"
           >
             <ul className="flex flex-col gap-2">
               {navItems.map((item) => (
@@ -126,7 +153,7 @@ export default function Navbar() {
                   <a
                     href={item.href}
                     onClick={() => handleClick(item.href)}
-                    className={`block w-full px-4 py-3 rounded-xl font-medium transition-all ${
+                    className={`block w-full px-4 py-3 rounded-full font-medium transition-all ${
                       active === item.href
                         ? "bg-primary text-white shadow-md shadow-primary/30"
                         : "text-onSurface hover:bg-black/5"

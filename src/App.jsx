@@ -1,5 +1,4 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
-// 1. Import Lenis
 import Lenis from 'lenis'; 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -21,30 +20,33 @@ export default function App() {
   const closeLogbook = () => setIsLogbookOpen(false);
 
   useEffect(() => {
-    // --- 1. RELOAD SCROLL FIX ---
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual';
     }
     window.scrollTo(0, 0);
 
-    // --- 2. LENIS SMOOTH SCROLL SETUP ---
-    const lenis = new Lenis({
-      duration: 1.2, // Scroll speed (Higher = Smoother)
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Smooth Easing Curve
-      smoothWheel: true, // Mouse wheel smoothing
-      touchMultiplier: 2, // Mobile sensitivity
-    });
+    // --- FIX: MOBILE PAR LENIS DISABLE KARNA ---
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    let lenis;
 
-    // Animation Loop for Lenis
-    function raf(time) {
-      lenis.raf(time);
+    // Sirf Desktop par Lenis initialize hoga
+    if (!isMobile) {
+      lenis = new Lenis({
+        duration: 1.2, 
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+        smoothWheel: true, 
+        // touchMultiplier nikaal diya hai taake touch events hijack na hon
+      });
+
+      function raf(time) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+      }
       requestAnimationFrame(raf);
     }
-    requestAnimationFrame(raf);
 
-    // Cleanup function
     return () => {
-      lenis.destroy();
+      if (lenis) lenis.destroy();
     };
   }, []);
 

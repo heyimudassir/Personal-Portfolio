@@ -1,42 +1,40 @@
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import { Code2, Cpu, MapPin } from "lucide-react";
 
-// --- OPTIMIZED BENTO BOX COMPONENT ---
-const BentoBox = ({ children, className, delay = 0 }) => (
-  <motion.div
-    layout // 1. Layout jumps ko khatam karega
-    initial={{ opacity: 0, y: 30 }} // Thoda aur neeche se start hoga
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: "-50px" }} // Thoda jaldi trigger hoga
-    
-    // 2. SOFT SPRING PHYSICS (Makkhan jaisa load)
-    transition={{ 
-      type: "spring", 
-      stiffness: 100, // Jitna kam, utna soft
-      damping: 20,    // Bounciness control
-      delay: delay    // Ek ke baad ek aayenge
-    }}
-    
-    // 3. SNAPPY HOVER (Touch response fast hona chahiye)
-    whileHover={{ 
-      scale: 1.02,
-      transition: { type: "spring", stiffness: 400, damping: 10 }
-    }}
-    
-    className={`backdrop-blur-md border border-white/30 rounded-3xl p-6 shadow-lg flex flex-col min-h-[180px] ${className}`}
-  >
-    {children}
-  </motion.div>
-);
+const smoothEase = [0.16, 1, 0.3, 1];
+
+// --- SPEED OPTIMIZED BENTO BOX ---
+const BentoBox = ({ children, className, delay = 0 }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "0px" }); // Strictly runs ONCE
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+      transition={{ 
+        duration: 0.4, // Faster duration
+        ease: smoothEase,
+        delay: delay 
+      }}
+      className={`transform-gpu md:backdrop-blur-md border border-white/30 rounded-3xl p-6 shadow-lg flex flex-col min-h-[180px] ${className}`}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
 export default function About() {
   return (
     <section id="about" className="py-20 px-4 max-w-6xl mx-auto">
-      
       <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-3 gap-4 md:gap-6 h-auto md:h-[800px]">
         
-        {/* 1. MAIN INTRO (Slowest Delay) */}
-        <BentoBox className="md:col-span-3 md:row-span-2 justify-center bg-gradient-to-br from-white/60 to-white/30" delay={0.1}>
+        {/* Delays drastically reduced for instant mobile loading */}
+        
+        {/* 1. MAIN INTRO (Instant) */}
+        <BentoBox className="md:col-span-3 md:row-span-2 justify-center bg-gradient-to-br from-white/60 to-white/30" delay={0}>
           <h2 className="text-3xl md:text-5xl font-bold text-primary mb-4 md:mb-6">
             More than just code.
           </h2>
@@ -48,21 +46,21 @@ export default function About() {
           </p>
         </BentoBox>
 
-        {/* 2. STATS */}
-        <BentoBox className="md:col-span-1 md:row-span-1 justify-center items-center bg-primary text-white" delay={0.2}>
+        {/* 2. STATS (Super Fast) */}
+        <BentoBox className="md:col-span-1 md:row-span-1 justify-center items-center bg-primary text-white" delay={0.05}>
           <span className="text-5xl md:text-6xl font-black">4+</span>
           <span className="text-sm uppercase tracking-widest opacity-80 mt-2">Years Exp.</span>
         </BentoBox>
 
         {/* 3. LOCATION */}
-        <BentoBox className="md:col-span-1 md:row-span-1 justify-center items-center bg-indigo-100" delay={0.3}>
+        <BentoBox className="md:col-span-1 md:row-span-1 justify-center items-center bg-indigo-100" delay={0.1}>
            <MapPin size={40} className="text-primary mb-2 md:mb-2 md:w-12 md:h-12" />
            <h3 className="font-bold text-lg md:text-xl text-primary">Lahore</h3>
            <p className="text-sm text-onSurface/60">Pakistan</p>
         </BentoBox>
 
         {/* 4. TECH STACK */}
-        <BentoBox className="md:col-span-2 md:row-span-1 bg-gray-900 text-white" delay={0.4}>
+        <BentoBox className="md:col-span-2 md:row-span-1 bg-gray-900 text-white" delay={0.15}>
           <div className="flex items-center gap-3 mb-4 text-purple-300">
             <Cpu />
             <span className="uppercase tracking-widest text-sm font-bold">Tech Stack</span>
@@ -77,7 +75,7 @@ export default function About() {
         </BentoBox>
 
         {/* 5. STATUS */}
-        <BentoBox className="md:col-span-1 md:row-span-1 justify-center bg-green-100" delay={0.5}>
+        <BentoBox className="md:col-span-1 md:row-span-1 justify-center bg-green-100" delay={0.2}>
            <div className="flex items-center gap-3 mb-2">
              <span className="relative flex h-3 w-3">
                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -89,8 +87,8 @@ export default function About() {
         </BentoBox>
 
         {/* 6. SOCIAL */}
-        <BentoBox className="md:col-span-1 md:row-span-1 justify-center items-center bg-white border-2 border-primary/10 cursor-pointer hover:border-primary transition-colors" delay={0.6}>
-           <a href="https://github.com/ohmudassir" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center">
+        <BentoBox className="md:col-span-1 md:row-span-1 justify-center items-center bg-white border-2 border-primary/10 cursor-pointer hover:border-primary transition-colors" delay={0.25}>
+           <a href="https://github.com/heyimudassir" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center">
              <Code2 size={40} className="text-onSurface mb-2 md:w-12 md:h-12" />
              <span className="font-bold text-lg">GitHub</span>
            </a>

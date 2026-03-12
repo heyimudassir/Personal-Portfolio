@@ -1,40 +1,26 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 
-export default function FadeInSection({ children }) {
+export default function FadeInSection({ children, delay = 0 }) {
   const ref = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const currentRef = ref.current;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          if (currentRef) observer.unobserve(currentRef);
-        }
-      },
-      // Mobile ke liye threshold kam kiya taake jaldi load ho
-      { threshold: 0.1, rootMargin: "50px" } 
-    );
-
-    if (currentRef) observer.observe(currentRef);
-
-    return () => {
-      if (currentRef) observer.unobserve(currentRef);
-    };
-  }, []);
+  
+  // 'once: true' ensures it strictly fires only ONE time.
+  // 'margin: "0px 0px -50px 0px"' triggers the animation slightly before it fully enters.
+  const isInView = useInView(ref, { once: true, margin: "0px 0px -50px 0px" });
 
   return (
-    <div
+    <motion.div
       ref={ref}
-      // FIX: 'will-change-transform' add kiya taake mobile GPU animation handle kare
-      className={`transform-gpu transition-all duration-700 ease-out ${
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-      }`}
-      // CSS hint for browser optimization
-      style={{ willChange: "opacity, transform" }}
+      initial={{ opacity: 0, y: 30 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+      transition={{
+        duration: 0.4, // Speed up the animation (from 0.7s to 0.4s)
+        delay: delay,
+        ease: [0.16, 1, 0.3, 1] // Ultra smooth Apple-style curve
+      }}
+      className="will-change-transform"
     >
       {children}
-    </div>
+    </motion.div>
   );
 }
