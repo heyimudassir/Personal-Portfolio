@@ -15,7 +15,7 @@ export default {
       },
       fontFamily: {
         // Naya: Modern clean look ke liye sans-serif ensure karna
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+         sans: ['Plus Jakarta Sans', 'sans-serif'] 
       },
       // Bento Grid ke liye row spans extend kiye hain
       gridTemplateRows: {

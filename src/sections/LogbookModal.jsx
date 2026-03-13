@@ -25,6 +25,7 @@ export default function LogbookModal({ onClose }) {
   const [posts, setPosts] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Lock background scrolling for normal browsers
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = "auto"; };
@@ -45,11 +46,16 @@ export default function LogbookModal({ onClose }) {
 
   return (
     <motion.div 
-      // Main modal ka animation wese hi rahega
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
+      
+      // 🔴 THE FIX: Lenis aur custom scrollers ko background scroll karne se rokne ke liye
+      data-lenis-prevent="true" 
+      onWheel={(e) => e.stopPropagation()} 
+      onTouchMove={(e) => e.stopPropagation()}
+
       className="fixed inset-0 z-[100] bg-surface p-4 overflow-y-auto scroll-smooth no-scrollbar"
     >
       <div className="max-w-3xl mx-auto flex justify-between items-center mb-8 pt-2">
@@ -71,8 +77,6 @@ export default function LogbookModal({ onClose }) {
           </>
         ) : (
           posts && posts.map((post) => (
-            // 🔴 THE FIX: 'motion.div' ko normal 'div' se replace kar diya hai
-            // Ab mobile browser iski opacity ko 0 par block nahi karega!
             <div
               key={post._id}
               className="p-6 bg-white rounded-[30px] shadow-sm border border-primary/10"

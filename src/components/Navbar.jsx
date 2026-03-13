@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Menu, X } from "lucide-react";
-import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
+// 🔴 NEW: useMotionValue aur animate import kiye hain
+import { motion, AnimatePresence, useMotionValue, animate } from "framer-motion";
 
 const navItems = [
   { name: "Home", href: "#home" },
@@ -14,34 +15,77 @@ export default function Navbar() {
   const [active, setActive] = useState("#home");
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false); // New state to hide/show navbar
 
-  // --- SMART SCROLL LOGIC ---
-  const { scrollY } = useScroll();
+  // 🔴 THE MAGIC WAND: GPU-Direct values (No React re-renders on scroll)
+  const navY = useMotionValue(0);
+  const navOpacity = useMotionValue(1);
+  const navScale = useMotionValue(1);
 
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    const previous = scrollY.getPrevious();
-    
-    // Background blur active check (50px se neechay aane par)
-    if (latest > 50) setScrolled(true);
-    else setScrolled(false);
+  // Ref to prevent unnecessary React renders for the background blur
+  const scrolledRef = useRef(false);
 
-    // Navbar hide/show logic (agar menu khula hai toh hide nahi karna)
-    if (!open) {
-      if (latest > previous && latest > 150) {
-        setHidden(true); // Scroll down -> Hide
-      } else {
-        setHidden(false); // Scroll up -> Show
+  // --- THE BULLETPROOF NATIVE SCROLL LOGIC ---
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+
+          // 1. Background Blur & Color Logic (Optimized to fire only once)
+          if (currentScrollY > 50 && !scrolledRef.current) {
+            scrolledRef.current = true;
+            setScrolled(true);
+          } else if (currentScrollY <= 50 && scrolledRef.current) {
+            scrolledRef.current = false;
+            setScrolled(false);
+          }
+
+          // 2. Hide / Show Logic (Direct DOM manipulation, 100% Smooth)
+          if (!open) {
+            if (currentScrollY < 100) {
+              // Top par hain -> Hamesha Show karein
+              animate(navY, 0, { type: "spring", stiffness: 250, damping: 25, mass: 0.5 });
+              animate(navOpacity, 1, { duration: 0.2 });
+              animate(navScale, 1, { duration: 0.2 });
+            } 
+            else if (currentScrollY > lastScrollY + 15) {
+              // Scroll Down -> Hide Navbar (upar slide kar do, halka sa chota karke fade kardo)
+              animate(navY, -100, { type: "spring", stiffness: 250, damping: 25, mass: 0.5 });
+              animate(navOpacity, 0, { duration: 0.2 });
+              animate(navScale, 0.95, { duration: 0.2 });
+            } 
+            else if (currentScrollY < lastScrollY - 15) {
+              // Scroll Up -> Show Navbar
+              animate(navY, 0, { type: "spring", stiffness: 250, damping: 25, mass: 0.5 });
+              animate(navOpacity, 1, { duration: 0.2 });
+              animate(navScale, 1, { duration: 0.2 });
+            }
+          }
+
+          // Only update lastScrollY if direction is confirmed (fixes slow scroll)
+          if (Math.abs(currentScrollY - lastScrollY) > 15) {
+            lastScrollY = currentScrollY;
+          }
+
+          ticking = false;
+        });
+        ticking = true;
       }
-    }
-  });
+    };
 
-  // --- ACTIVE LINK TRACKER (Fixed for Home detection) ---
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [open, navY, navOpacity, navScale]);
+
+  // --- ACTIVE LINK TRACKER ---
   useEffect(() => {
     const handleScrollManual = () => {
-      // Agar user bilkul top par hai (e.g., < 100px), toh Home ko active rakho
       if (window.scrollY < 100) {
-        setActive("#home");
+        // 🔴 FIX: Prevent re-rendering every single pixel if already on #home
+        setActive((prev) => (prev !== "#home" ? "#home" : prev));
       }
     };
 
@@ -50,13 +94,11 @@ export default function Navbar() {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          // Home ke ilawa baqi sections ke liye observer kaam karega
           if (entry.isIntersecting && window.scrollY >= 100) {
             setActive(`#${entry.target.id}`);
           }
         });
       },
-      // Margin ko thora adjust kiya taake detection center mein ho
       { rootMargin: "-30% 0px -30% 0px", threshold: 0 }
     );
 
@@ -64,8 +106,7 @@ export default function Navbar() {
       if (section) observer.observe(section);
     });
 
-    // Manual scroll listener for Home section
-    window.addEventListener("scroll", handleScrollManual);
+    window.addEventListener("scroll", handleScrollManual, { passive: true });
 
     return () => {
       sections.forEach((section) => {
@@ -82,21 +123,16 @@ export default function Navbar() {
 
   return (
     <motion.nav
-      // --- SMART ANIMATION ---
-      variants={{
-        visible: { y: 0, opacity: 1 },
-        hidden: { y: -100, opacity: 0 } // Upar slide ho jayega
-      }}
-      initial="visible"
-      animate={hidden ? "hidden" : "visible"}
-      transition={{ duration: 0.35, ease: "easeInOut" }}
-      className={`fixed top-4 left-0 right-0 z-50 mx-auto w-[95%] max-w-4xl transition-colors duration-300 ${
+      // 🔴 THE FIX: 'variants', 'animate' wagera nikal diye hain. 
+      // Ab ye direct GPU variables se connect hai.
+      style={{ y: navY, opacity: navOpacity, scale: navScale }}
+      className={`fixed top-4 left-0 right-0 z-50 mx-auto w-[95%] max-w-4xl transition-colors duration-300 transform-gpu will-change-transform ${
         scrolled
           ? "bg-white/70 backdrop-blur-xl border border-white/40 shadow-lg shadow-black/5"
           : "bg-white/50 backdrop-blur-md border border-white/20"
       } rounded-full px-6 py-3`}
     >
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center relative z-20">
         
         {/* LOGO */}
         <a href="#home" className="text-xl font-bold text-primary tracking-tight">
@@ -131,7 +167,7 @@ export default function Navbar() {
         {/* Mobile Toggle */}
         <button
           onClick={() => setOpen(!open)}
-          className="md:hidden p-2 text-onSurface hover:bg-black/5 rounded-full transition"
+          className="md:hidden p-2 text-onSurface hover:bg-black/5 rounded-full transition relative z-20"
         >
           {open ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -145,7 +181,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-16 left-0 right-0 bg-white/95 backdrop-blur-xl border border-white/40 rounded-3xl shadow-2xl p-4 mx-2 overflow-hidden"
+            className="absolute top-full mt-2 left-0 right-0 bg-white/95 backdrop-blur-xl border border-white/40 rounded-3xl shadow-2xl p-4 mx-2 overflow-hidden -z-10"
           >
             <ul className="flex flex-col gap-2">
               {navItems.map((item) => (
