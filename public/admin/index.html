@@ -3,35 +3,36 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mudassir's Admin Panel</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Admin Panel - Material 3</title>
   </head>
   <body>
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 
     <script>
+      // 1. Stable Tailwind v2 and Font Injection
+      CMS.registerPreviewStyle("https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css");
       CMS.registerPreviewStyle("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
-      CMS.registerPreviewStyle("https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css");
 
       var ProjectPreview = createClass({
         render: function() {
           var entry = this.props.entry;
-          var title = entry.getIn(['data', 'title']) || "Project Title";
+          
+          // Data Fetching
+          var title = entry.getIn(['data', 'title']) || "Expressive Title";
           var category = entry.getIn(['data', 'category']) || "Category";
-          var description = entry.getIn(['data', 'description']) || "Type your description here...";
+          var description = entry.getIn(['data', 'description']) || "Your expressive description will appear here...";
 
-          // Bulletproof Tags
+          // Bulletproof Tags Processing
           var tagsData = entry.getIn(['data', 'tags']);
           var tagsArray = [];
           if (tagsData) {
               if (typeof tagsData === 'string') {
-                  tagsArray = tagsData.split(',').map(t => t.trim());
+                  tagsArray = tagsData.split(',');
               } else if (tagsData.toJS) {
                   var jsData = tagsData.toJS();
-                  if(Array.isArray(jsData)) {
-                      if(jsData.length === 1 && jsData[0].includes(',')) {
-                          tagsArray = jsData[0].split(',').map(t => t.trim());
+                  if (Array.isArray(jsData)) {
+                      if (jsData.length === 1 && typeof jsData[0] === 'string' && jsData[0].includes(',')) {
+                          tagsArray = jsData[0].split(',');
                       } else {
                           tagsArray = jsData;
                       }
@@ -39,40 +40,52 @@
               }
           }
 
-          var tagsElements = tagsArray.filter(Boolean).map(function(tag, index) {
-            return h('span', {key: index, className: "px-4 py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs font-bold tracking-wide border border-gray-200"}, tag);
+          // Material 3 Tag Pills
+          var tagsElements = tagsArray.map(function(t) { return t && typeof t === 'string' ? t.trim() : ''; }).filter(Boolean).map(function(tag, index) {
+            return h('span', { 
+                key: index, 
+                className: "px-4 py-2 text-sm font-bold tracking-wide",
+                // M3 Secondary Container Style
+                style: { backgroundColor: '#E8DEF8', color: '#1D192B', borderRadius: '9999px' } 
+            }, tag);
           });
 
-          // Image Check
-          var hasImage = !!entry.getIn(['data', 'image']);
+          // Standardized Image Fetching
+          var imageField = entry.getIn(['data', 'image']);
+          var imageAsset = imageField ? this.props.getAsset(imageField) : null;
+          var imageUrl = imageAsset ? imageAsset.toString() : "";
 
-          // THE PERFECT BENTO CARD UI
-          return h('div', {style: {fontFamily: '"Plus Jakarta Sans", sans-serif', padding: '30px', backgroundColor: '#f3f4f6', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}},
-            // Main Card Container (Fully Rounded & Hidden Overflow)
-            h('div', {className: "w-full max-w-5xl bg-white rounded-[40px] shadow-2xl overflow-hidden flex flex-col md:flex-row border border-gray-200"},
-              
-              // LEFT SIDE: Text Content
-              h('div', {className: "w-full md:w-1/2 p-10 md:p-14 flex flex-col justify-center bg-white"},
-                h('div', {className: "flex items-center gap-4 mb-6"},
-                  h('span', {className: "w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-2xl"}, "💻"), 
-                  h('span', {className: "text-sm font-extrabold uppercase tracking-widest text-indigo-600"}, category)
+          // ==========================================
+          // THE MATERIAL 3 EXPRESSIVE UI (FAIL-PROOF)
+          // ==========================================
+          return h('div', { style: { fontFamily: '"Plus Jakarta Sans", sans-serif', padding: '40px', backgroundColor: '#FEF7FF', minHeight: '100vh', boxSizing: 'border-box' } },
+            
+            // Main Card (M3 Surface)
+            h('div', { className: "max-w-5xl mx-auto flex flex-col md:flex-row overflow-hidden", style: { backgroundColor: '#FFFFFF', borderRadius: '32px', border: '1px solid #EADDFF', boxShadow: '0px 8px 24px rgba(29, 25, 43, 0.08)' } },
+
+              // LEFT: Content Area
+              h('div', { className: "w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center" },
+                h('div', { className: "mb-6" },
+                  // M3 Primary Container Badge
+                  h('span', { className: "px-4 py-2 text-xs font-extrabold uppercase tracking-wider", style: { backgroundColor: '#EADDFF', color: '#21005D', borderRadius: '12px' } }, category)
                 ),
-                // Text break-words prevents layout breaking
-                h('h3', {className: "text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-5 break-words tracking-tight"}, title),
-                h('p', {className: "text-base md:text-lg text-gray-500 leading-relaxed mb-8 break-words"}, description),
-                h('div', {className: "flex flex-wrap gap-2"}, tagsElements)
+                h('h1', { className: "text-4xl md:text-5xl font-extrabold mb-6 leading-tight", style: { color: '#1C1B1F' } }, title),
+                h('p', { className: "text-lg mb-8 leading-relaxed whitespace-pre-wrap", style: { color: '#49454F' } }, description),
+                h('div', { className: "flex flex-wrap gap-3" }, tagsElements)
               ),
 
-              // RIGHT SIDE: Image Area
-              h('div', {className: "w-full md:w-1/2 bg-gray-50 border-l border-gray-100 flex items-center justify-center p-10 relative min-h-[400px]"},
-                hasImage 
-                  // CMS Native Image Widget perfectly centered
-                  ? h('div', {className: "w-full h-full flex items-center justify-center [&_img]:max-h-[350px] [&_img]:w-auto [&_img]:object-contain [&_img]:drop-shadow-2xl [&_img]:transform [&_img]:transition-transform [&_img]:hover:scale-105"}, this.props.widgetFor('image')) 
-                  // Fallback if no image uploaded yet
-                  : h('div', {className: "flex flex-col items-center justify-center text-gray-400 opacity-60"}, 
-                      h('span', {className: "text-6xl mb-4"}, "🖼️"),
-                      h('span', {className: "font-semibold text-lg tracking-wide"}, "Upload Image")
-                    )
+              // RIGHT: Image Area (M3 Surface Container Highest)
+              h('div', { className: "w-full md:w-1/2 p-4 md:p-6" },
+                h('div', { className: "w-full h-full flex items-center justify-center overflow-hidden relative", style: { backgroundColor: '#E6E0E9', borderRadius: '24px', minHeight: '350px' } },
+                  imageUrl
+                    // Render image if uploaded
+                    ? h('img', { src: imageUrl, className: "w-full h-full object-cover", style: { position: 'absolute', top: 0, left: 0 } })
+                    // Render M3 Placeholder if no image
+                    : h('div', { className: "flex flex-col items-center justify-center text-center", style: { color: '#49454F' } },
+                        h('span', { style: { fontSize: '48px', marginBottom: '16px' } }, "📸"),
+                        h('span', { className: "font-bold text-lg" }, "Material Frame")
+                      )
+                )
               )
             )
           );
