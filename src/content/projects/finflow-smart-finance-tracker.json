@@ -1,0 +1,13 @@
+{
+  "featured": true,
+  "title": "Finflow: Smart Finance Tracker",
+  "category": "Mobile App",
+  "description": "Finflow is a modern personal finance application designed to track your daily expenses, manage active subscriptions, and visualize your wealth in real-time. Take complete control of your money, effortlessly.",
+  "tags": [
+    "React Native",
+    "Expo",
+    "Tailwind"
+  ],
+  "image": "/uploads/my_app.svg",
+  "video": "/uploads/img_20260312_155227_793.mp4"
+}
