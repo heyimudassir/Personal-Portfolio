@@ -1,41 +1,95 @@
 import { useState, useRef } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { Github, ExternalLink, Cpu, Monitor, Play, X, ArrowRight } from "lucide-react";
+
+// --- MODAL COMPONENT ---
 import ArchiveModal from "./ArchiveModal"; 
 
-// 🟢 THE MAGIC: Vite automatically fetches all JSON files from your CMS folder
-const projectFiles = import.meta.glob('../content/projects/*.json', { eager: true });
+// --- ASSETS IMPORT ---
+import imgStudent from "../assets/desktopApp.svg";
+import vidStudent from "../assets/desktopAppVideo.mp4";
 
-// Convert JSON files into an array that our cards can read
-const colors = ["bg-purple-100", "bg-blue-100", "bg-orange-100", "bg-green-100", "bg-pink-100"];
+import imgSolar from "../assets/solarThumbnail.svg";
+import vidSolar from "../assets/solar.mp4";
 
-const projectsData = Object.keys(projectFiles).map((key, index) => {
-  const project = projectFiles[key].default;
-  
-  return {
-    id: index + 1,
-    title: project.title,
-    category: project.category,
-    description: project.description,
-    tags: project.tags || [],
-    featured: project.featured || false,
-    
-    // Dynamic Icon based on Category name
-    icon: project.category?.toLowerCase().includes("iot") ? <Cpu /> : <Monitor />,
-    
-    // Assigning a dynamic color from our array based on index
-    color: colors[index % colors.length],
-    
-    // CMS saves image paths starting with /uploads/
-    image: project.image || null,
-    video: project.video || null,
-    github: project.github || null,
-    link: project.link || null,
-  };
-});
+import imgFault from "../assets/Fault.svg";
+import vidFault from "../assets/FaultVideo.mp4";
+
+// --- COMBINED PROJECT DATA ---
+const projectsData = [
+  {
+    id: 1,
+    title: "Student Management System",
+    category: "Desktop App",
+    description: "A Python-based desktop application designed to simplify attendance tracking, student data handling, and overall academic management.",
+    tags: ["Python", "Tkinter", "CSV", "CustomTkinter"],
+    icon: <Monitor />,
+    color: "bg-purple-100",
+    image: imgStudent,
+    video: vidStudent,
+    github: "https://github.com/yourusername/student-system",
+    link: null, 
+    featured: true, 
+  },
+  {
+    id: 2,
+    title: "Solar Cleaner via Bluetooth",
+    category: "IoT System",
+    description: "IoT-based Solar Panel Cleaning System using HC-05 Bluetooth module. Allows remote cleaning via mobile app.",
+    tags: ["Arduino", "Python", "MQTT", "Sensors"],
+    icon: <Cpu />,
+    color: "bg-blue-100",
+    image: imgSolar,
+    video: vidSolar,
+    github: "https://github.com/yourusername/solar-cleaner",
+    link: null,
+    featured: true,
+  },
+  {
+    id: 3,
+    title: "Fault Detection System",
+    category: "Real-time IoT",
+    description: "Real-time fault detection system ensuring safety in industrial environments using advanced sensors.",
+    tags: ["IoT", "Real-time", "C++", "Hardware"],
+    icon: <Cpu />,
+    color: "bg-orange-100",
+    image: imgFault,
+    video: vidFault,
+    github: "https://github.com/yourusername/fault-detection",
+    link: null,
+    featured: true,
+  },
+  {
+    id: 4,
+    title: "Fileforma Web Tool",
+    category: "Web App",
+    description: "A fast, responsive web application utilizing ConvertAPI for seamless document format transformations directly in the browser.",
+    tags: ["Next.js", "Tailwind CSS", "API"],
+    icon: <Monitor />,
+    color: "bg-green-100",
+    image: null, 
+    video: null,
+    github: "#",
+    link: "https://heyimudassir.netlify.app", 
+    featured: false, 
+  },
+  {
+    id: 5,
+    title: "Workshop POS System",
+    category: "Desktop App",
+    description: "A robust desktop application tailored for a bike spare parts workshop, handling real-time inventory tracking and order management.",
+    tags: ["C#", "WPF", "SQL Database"],
+    icon: <Monitor />,
+    color: "bg-gray-200",
+    image: null,
+    video: null,
+    github: "#",
+    link: null,
+    featured: false, 
+  }
+];
 
 // --- SINGLE CARD COMPONENT ---
-// (Yahan aapka pichla Stacked Cards wala <ProjectCard /> component aayega, usme koi change nahi karni)
 const ProjectCard = ({ project, index, targetScale, onOpenVideo }) => {
   const container = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -48,6 +102,7 @@ const ProjectCard = ({ project, index, targetScale, onOpenVideo }) => {
   return (
     <div ref={container} className="h-screen flex items-center justify-center sticky top-20 md:top-28">
       <motion.div 
+        // 🔴 GPU Optimization added here for smooth stacking
         style={{ scale, top: `calc(-5vh + ${index * 15}px)`, WebkitBackfaceVisibility: 'hidden' }} 
         className="relative z-10 flex flex-col md:flex-row gap-4 md:gap-8 w-full max-w-5xl h-[70vh] bg-white border border-white/20 rounded-[30px] md:rounded-[40px] p-6 md:p-12 shadow-2xl origin-top transform-gpu will-change-transform"
       >
