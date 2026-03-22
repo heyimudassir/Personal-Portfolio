@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { Github, ExternalLink, Cpu, Monitor, Play, X, ArrowRight } from "lucide-react";
 
-// --- MODAL COMPONENT (Make sure you saved ArchiveModal.jsx in the same folder) ---
+// --- MODAL COMPONENT ---
 import ArchiveModal from "./ArchiveModal"; 
 
 // --- ASSETS IMPORT ---
@@ -16,8 +16,6 @@ import imgFault from "../assets/Fault.svg";
 import vidFault from "../assets/FaultVideo.mp4";
 
 // --- COMBINED PROJECT DATA ---
-// Main screen par wohi projects ayenge jinki `featured: true` hai.
-// Archive modal mein saare (featured + non-featured) projects show honge.
 const projectsData = [
   {
     id: 1,
@@ -30,7 +28,7 @@ const projectsData = [
     image: imgStudent,
     video: vidStudent,
     github: "https://github.com/yourusername/student-system",
-    link: null, // Agar live link ho toh yahan dein
+    link: null, 
     featured: true, 
   },
   {
@@ -61,7 +59,6 @@ const projectsData = [
     link: null,
     featured: true,
   },
-  // --- ARCHIVE ONLY PROJECTS (Inko featured: false rakha hai) ---
   {
     id: 4,
     title: "Fileforma Web Tool",
@@ -92,7 +89,7 @@ const projectsData = [
   }
 ];
 
-// --- SINGLE CARD COMPONENT (Keep your original logic) ---
+// --- SINGLE CARD COMPONENT ---
 const ProjectCard = ({ project, index, targetScale, onOpenVideo }) => {
   const container = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -105,8 +102,9 @@ const ProjectCard = ({ project, index, targetScale, onOpenVideo }) => {
   return (
     <div ref={container} className="h-screen flex items-center justify-center sticky top-20 md:top-28">
       <motion.div 
-        style={{ scale, top: `calc(-5vh + ${index * 15}px)` }} 
-        className="relative z-10 flex flex-col md:flex-row gap-4 md:gap-8 w-full max-w-5xl h-[70vh] bg-white border border-white/20 rounded-[30px] md:rounded-[40px] p-6 md:p-12 shadow-2xl origin-top will-change-transform"
+        // 🔴 GPU Optimization added here for smooth stacking
+        style={{ scale, top: `calc(-5vh + ${index * 15}px)`, WebkitBackfaceVisibility: 'hidden' }} 
+        className="relative z-10 flex flex-col md:flex-row gap-4 md:gap-8 w-full max-w-5xl h-[70vh] bg-white border border-white/20 rounded-[30px] md:rounded-[40px] p-6 md:p-12 shadow-2xl origin-top transform-gpu will-change-transform"
       >
         
         {/* Left Side: Content */}
@@ -184,9 +182,8 @@ const ProjectCard = ({ project, index, targetScale, onOpenVideo }) => {
 export default function Work() {
   const container = useRef(null);
   const [selectedVideo, setSelectedVideo] = useState(null);
-  const [isArchiveOpen, setIsArchiveOpen] = useState(false); // Modal State
+  const [isArchiveOpen, setIsArchiveOpen] = useState(false);
 
-  // Filter ONLY featured projects for the scrolling cards
   const featuredProjects = projectsData.filter(p => p.featured);
 
   return (

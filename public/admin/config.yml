@@ -1,0 +1,26 @@
+backend:
+  name: git-gateway
+  branch: main # Agar aapki branch ka naam master hai, toh isay 'master' kar dein
+
+# Images yahan save hongi
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+collections:
+  - name: "projects"
+    label: "Projects"
+    folder: "src/content/projects" # Aapke naye JSON projects yahan save honge
+    create: true
+    slug: "{{slug}}"
+    format: "json"
+    extension: "json"
+    fields:
+      - {label: "Project Title", name: "title", widget: "string"}
+      - {label: "Category (e.g., Web App, IoT System)", name: "category", widget: "string"}
+      - {label: "Description", name: "description", widget: "text"}
+      - {label: "Tags", name: "tags", widget: "list"}
+      - {label: "Featured (Show on Home?)", name: "featured", widget: "boolean", default: false}
+      - {label: "Project Image", name: "image", widget: "image", required: false}
+      - {label: "Video Demo (MP4)", name: "video", widget: "file", required: false}
+      - {label: "Github Link", name: "github", widget: "string", required: false}
+      - {label: "Live Demo Link", name: "link", widget: "string", required: false}
