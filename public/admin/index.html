@@ -9,20 +9,16 @@
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 
     <script>
-      // 1. Stable Tailwind v2 and Font Injection
       CMS.registerPreviewStyle("https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css");
       CMS.registerPreviewStyle("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
       var ProjectPreview = createClass({
         render: function() {
           var entry = this.props.entry;
-          
-          // Data Fetching
           var title = entry.getIn(['data', 'title']) || "Expressive Title";
           var category = entry.getIn(['data', 'category']) || "Category";
-          var description = entry.getIn(['data', 'description']) || "Your expressive description will appear here...";
+          var description = entry.getIn(['data', 'description']) || "Your expressive description...";
 
-          // Bulletproof Tags Processing
           var tagsData = entry.getIn(['data', 'tags']);
           var tagsArray = [];
           if (tagsData) {
@@ -40,47 +36,35 @@
               }
           }
 
-          // Material 3 Tag Pills
           var tagsElements = tagsArray.map(function(t) { return t && typeof t === 'string' ? t.trim() : ''; }).filter(Boolean).map(function(tag, index) {
             return h('span', { 
                 key: index, 
                 className: "px-4 py-2 text-sm font-bold tracking-wide",
-                // M3 Secondary Container Style
                 style: { backgroundColor: '#E8DEF8', color: '#1D192B', borderRadius: '9999px' } 
             }, tag);
           });
 
-          // Standardized Image Fetching
+          // 🟢 THE ULTIMATE FIX: Strict Image Field Check
           var imageField = entry.getIn(['data', 'image']);
-          var imageAsset = imageField ? this.props.getAsset(imageField) : null;
-          var imageUrl = imageAsset ? imageAsset.toString() : "";
+          // Check if user has ACTUALLY uploaded an image
+          var hasImage = imageField != null && imageField !== '';
 
-          // ==========================================
-          // THE MATERIAL 3 EXPRESSIVE UI (FAIL-PROOF)
-          // ==========================================
           return h('div', { style: { fontFamily: '"Plus Jakarta Sans", sans-serif', padding: '40px', backgroundColor: '#FEF7FF', minHeight: '100vh', boxSizing: 'border-box' } },
-            
-            // Main Card (M3 Surface)
             h('div', { className: "max-w-5xl mx-auto flex flex-col md:flex-row overflow-hidden", style: { backgroundColor: '#FFFFFF', borderRadius: '32px', border: '1px solid #EADDFF', boxShadow: '0px 8px 24px rgba(29, 25, 43, 0.08)' } },
-
-              // LEFT: Content Area
               h('div', { className: "w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center" },
                 h('div', { className: "mb-6" },
-                  // M3 Primary Container Badge
                   h('span', { className: "px-4 py-2 text-xs font-extrabold uppercase tracking-wider", style: { backgroundColor: '#EADDFF', color: '#21005D', borderRadius: '12px' } }, category)
                 ),
                 h('h1', { className: "text-4xl md:text-5xl font-extrabold mb-6 leading-tight", style: { color: '#1C1B1F' } }, title),
                 h('p', { className: "text-lg mb-8 leading-relaxed whitespace-pre-wrap", style: { color: '#49454F' } }, description),
                 h('div', { className: "flex flex-wrap gap-3" }, tagsElements)
               ),
-
-              // RIGHT: Image Area (M3 Surface Container Highest)
               h('div', { className: "w-full md:w-1/2 p-4 md:p-6" },
                 h('div', { className: "w-full h-full flex items-center justify-center overflow-hidden relative", style: { backgroundColor: '#E6E0E9', borderRadius: '24px', minHeight: '350px' } },
-                  imageUrl
-                    // Render image if uploaded
-                    ? h('img', { src: imageUrl, className: "w-full h-full object-cover", style: { position: 'absolute', top: 0, left: 0 } })
-                    // Render M3 Placeholder if no image
+                  hasImage
+                    // 🟢 NATIVE CMS PREVIEW: Ab koi manual link generate nahi hoga, CMS khud Blob handle karega
+                    ? h('div', { className: "w-full h-full flex items-center justify-center p-4 [&_img]:max-h-[300px] [&_img]:w-auto [&_img]:rounded-2xl [&_img]:shadow-md [&_img]:object-contain" }, this.props.widgetFor('image'))
+                    // Placeholder (Agar image upload nahi hui)
                     : h('div', { className: "flex flex-col items-center justify-center text-center", style: { color: '#49454F' } },
                         h('span', { style: { fontSize: '48px', marginBottom: '16px' } }, "📸"),
                         h('span', { className: "font-bold text-lg" }, "Material Frame")
