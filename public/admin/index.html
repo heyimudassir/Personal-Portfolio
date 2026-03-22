@@ -21,7 +21,7 @@
           var category = entry.getIn(['data', 'category']) || "Category";
           var description = entry.getIn(['data', 'description']) || "Type your description here...";
 
-          // 🟢 BUG FIX 1: Bulletproof Tags (Handles comma-separated strings perfectly)
+          // 1. Tags Logic (Perfected for commas)
           var tagsData = entry.getIn(['data', 'tags']);
           var tagsArray = [];
           if (tagsData) {
@@ -30,7 +30,6 @@
               } else if (tagsData.toJS) {
                   var jsData = tagsData.toJS();
                   if(Array.isArray(jsData)) {
-                      // If user types commas in the first list item
                       if(jsData.length === 1 && jsData[0].includes(',')) {
                           tagsArray = jsData[0].split(',').map(t => t.trim());
                       } else {
@@ -44,31 +43,36 @@
             return h('span', {key: index, className: "px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium border border-gray-200"}, tag);
           });
 
-          // 🟢 BUG FIX 2: Image Preview Rendering
-          var image = entry.getIn(['data', 'image']);
-          var bgImage = image ? this.props.getAsset(image) : null;
-          var imageSrc = bgImage ? bgImage.toString() : '';
+          // 2. Bulletproof Image Logic
+          var imagePath = entry.getIn(['data', 'image']);
+          // Check if path exists before trying to get asset
+          var imageUrl = imagePath ? this.props.getAsset(imagePath).toString() : "";
 
-          // 🟢 BUG FIX 3: Forced Desktop Layout (Removed 'md:' so it never stacks vertically in preview)
+          // 3. Main UI Return
           return h('div', {style: {fontFamily: '"Plus Jakarta Sans", sans-serif', padding: '20px', backgroundColor: '#f9fafb', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}},
             h('div', {className: "flex flex-row gap-8 w-full max-w-5xl bg-white rounded-[40px] p-8 shadow-2xl"},
               
               // LEFT SIDE: Content
-              h('div', {className: "w-1/2 flex flex-col justify-center gap-6"},
+              h('div', {className: "w-1/2 flex flex-col justify-center gap-6 border border-gray-100 rounded-3xl p-6"},
                 h('div', {className: "flex items-center gap-3"},
                   h('span', {className: "w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 text-xl"}, "💻"), 
                   h('span', {className: "text-sm font-bold uppercase tracking-widest text-purple-700"}, category)
                 ),
                 h('h3', {className: "text-3xl font-bold text-gray-900 leading-tight"}, title),
-                h('p', {className: "text-sm text-gray-600 leading-relaxed"}, description),
+                h('p', {className: "text-sm text-gray-600 leading-relaxed whitespace-pre-wrap"}, description),
                 h('div', {className: "flex flex-wrap gap-2"}, tagsElements)
               ),
 
               // RIGHT SIDE: Image
               h('div', {className: "w-1/2 min-h-[300px] rounded-3xl overflow-hidden relative border border-gray-100 shadow-inner bg-gray-50 flex items-center justify-center"},
-                imageSrc 
-                  ? h('img', {src: imageSrc, className: "w-auto h-[85%] object-contain drop-shadow-lg"}) 
-                  : h('div', {className: "text-gray-400 font-bold"}, "No Image Uploaded")
+                imageUrl 
+                  // Agar image hai toh show karo
+                  ? h('img', {src: imageUrl, className: "w-full h-full object-contain drop-shadow-lg p-6"}) 
+                  // Agar nahi hai toh yeh placeholder show karo (broken icon nahi aayega)
+                  : h('div', {className: "flex flex-col items-center justify-center text-gray-400"}, 
+                      h('span', {className: "text-4xl mb-2"}, "🖼️"),
+                      h('span', {className: "font-bold text-sm"}, "Select an image below")
+                    )
               )
             )
           );
