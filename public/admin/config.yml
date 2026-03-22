@@ -1,15 +1,17 @@
 backend:
   name: git-gateway
-  branch: main # Agar aapki branch ka naam master hai, toh isay 'master' kar dein
+  branch: main 
 
-# Images yahan save hongi
+# 🟢 NAYA: Login screen par aapki profile pic ya logo aayega
+logo_url: https://heyimudassir.netlify.app/avatar.webp
+
 media_folder: "public/uploads"
 public_folder: "/uploads"
 
 collections:
   - name: "projects"
     label: "Projects"
-    folder: "src/content/projects" # Aapke naye JSON projects yahan save honge
+    folder: "src/content/projects"
     create: true
     slug: "{{slug}}"
     format: "json"
