@@ -11,38 +11,57 @@
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 
     <script>
-      // Font aur Tailwind ko Preview window ke andar bhejna
+      // Font aur Tailwind setup
       CMS.registerPreviewStyle("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
       CMS.registerPreviewStyle("https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css");
 
-      // Custom React Component for Live Preview (Bento Card Style)
+      // Custom React Component: Exact Stacked Card Design
       var ProjectPreview = createClass({
         render: function() {
           var entry = this.props.entry;
           var title = entry.getIn(['data', 'title']) || "Project Title";
           var category = entry.getIn(['data', 'category']) || "Category";
           var description = entry.getIn(['data', 'description']) || "Type your description here...";
-          var image = entry.getIn(['data', 'image']);
-          var bgImage = this.props.getAsset(image);
+          
+          // 🟢 BUG FIX: Tags List Mapping
+          var tagsList = entry.getIn(['data', 'tags']);
+          var tagsArray = tagsList ? tagsList.toJS() : [];
+          var tagsElements = tagsArray.map(function(tag, index) {
+            return h('span', {key: index, className: "px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium border border-gray-200"}, tag);
+          });
 
-          return h('div', {style: {fontFamily: '"Plus Jakarta Sans", sans-serif', padding: '40px', backgroundColor: '#f9fafb', minHeight: '100vh'}},
-            h('div', {className: "max-w-xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100"},
-              // Image Area
-              h('div', {className: "h-64 bg-purple-50 relative flex items-center justify-center overflow-hidden p-6"},
-                bgImage ? h('img', {src: bgImage.toString(), className: "object-contain h-full w-full relative z-10 drop-shadow-xl"}) : h('div', {className: "text-purple-300 font-bold"}, "No Image Uploaded Yet")
+          // 🟢 BUG FIX: Image Handling
+          var image = entry.getIn(['data', 'image']);
+          var bgImage = image ? this.props.getAsset(image) : null;
+          var imageSrc = bgImage ? bgImage.toString() : '';
+
+          // 🟢 MAIN UI: 100% Same as your live website
+          return h('div', {style: {fontFamily: '"Plus Jakarta Sans", sans-serif', padding: '40px', backgroundColor: '#f9fafb', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}},
+            h('div', {className: "flex flex-col md:flex-row gap-8 w-full max-w-5xl bg-white rounded-[40px] p-12 shadow-2xl"},
+              
+              // LEFT SIDE: Content
+              h('div', {className: "w-full md:w-1/2 flex flex-col justify-center gap-6"},
+                h('div', {className: "flex items-center gap-3"},
+                  h('span', {className: "w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 text-xl"}, "💻"), 
+                  h('span', {className: "text-sm font-bold uppercase tracking-widest text-purple-700"}, category)
+                ),
+                h('h3', {className: "text-4xl font-bold text-gray-900 leading-tight"}, title),
+                h('p', {className: "text-lg text-gray-600 leading-relaxed"}, description),
+                // Tags Container
+                h('div', {className: "flex flex-wrap gap-2"}, tagsElements)
               ),
-              // Content Area
-              h('div', {className: "p-8"},
-                h('span', {className: "text-xs font-bold text-purple-600 uppercase tracking-widest bg-purple-100 px-3 py-1 rounded-full"}, category),
-                h('h2', {className: "text-3xl font-bold mt-4 mb-3 text-gray-900 leading-tight"}, title),
-                h('p', {className: "text-gray-600 leading-relaxed text-sm"}, description)
+
+              // RIGHT SIDE: Image
+              h('div', {className: "w-full md:w-1/2 h-96 rounded-3xl overflow-hidden relative border border-gray-100 shadow-inner bg-gray-50 flex items-center justify-center"},
+                imageSrc 
+                  ? h('img', {src: imageSrc, className: "w-auto h-[85%] object-contain drop-shadow-lg"}) 
+                  : h('div', {className: "text-gray-400 font-bold"}, "No Image Uploaded")
               )
             )
           );
         }
       });
 
-      // CMS ko batana ke projects collection par yeh design apply karna hai
       CMS.registerPreviewTemplate("projects", ProjectPreview);
     </script>
   </body>
