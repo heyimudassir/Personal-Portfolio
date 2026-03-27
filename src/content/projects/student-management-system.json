@@ -1,0 +1,14 @@
+{
+  "featured": false,
+  "title": "Student Management System",
+  "category": "Desktop App",
+  "description": "A Python-based desktop application designed to simplify attendance tracking, student data handling, and overall academic management.",
+  "tags": [
+    "Python",
+    "Tkinter",
+    "CSV",
+    "CustomTkinter"
+  ],
+  "image": "/uploads/desktopapp.svg",
+  "video": "/uploads/desktopappvideo.mp4"
+}
