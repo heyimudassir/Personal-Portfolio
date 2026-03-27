@@ -1,5 +1,5 @@
 {
-  "featured": false,
+  "featured": true,
   "title": "Student Management System",
   "category": "Desktop App",
   "description": "A Python-based desktop application designed to simplify attendance tracking, student data handling, and overall academic management.",
