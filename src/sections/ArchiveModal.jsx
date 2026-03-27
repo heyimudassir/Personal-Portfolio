@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
-import { X, ExternalLink, Github } from "lucide-react";
+// 👇 ArrowUpRight icon add kiya hai
+import { X, ExternalLink, Github, ArrowUpRight } from "lucide-react"; 
 import { motion } from "framer-motion";
 
 const modalEase = [0.25, 0.1, 0.25, 1];
 
-export default function ArchiveModal({ onClose, projects }) {
+export default function ArchiveModal({ onClose, projects, onOpenDetails }) {
   // Lock background scrolling for normal browsers
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -18,7 +19,6 @@ export default function ArchiveModal({ onClose, projects }) {
       exit={{ opacity: 0, y: 20 }}
       transition={{ duration: 0.4, ease: modalEase }}
       
-      // 🔴 THE FIX: Lenis aur custom scrollers ko background scroll karne se rokne ke liye
       data-lenis-prevent="true" 
       onWheel={(e) => e.stopPropagation()} 
       onTouchMove={(e) => e.stopPropagation()}
@@ -47,13 +47,16 @@ export default function ArchiveModal({ onClose, projects }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: Math.min(index * 0.05, 0.3), ease: "easeOut" }}
-              className="group p-6 bg-white rounded-3xl shadow-sm border border-primary/10 hover:shadow-md transition-all flex flex-col h-full hover:-translate-y-1"
+              
+              // Card par click karne se bhi open hoga
+              onClick={() => onOpenDetails && onOpenDetails(project)}
+              className="group p-6 bg-white rounded-3xl shadow-sm border border-primary/10 hover:shadow-md transition-all flex flex-col h-full hover:-translate-y-1 cursor-pointer"
             >
               <div className="flex justify-between items-start mb-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-primary/60 bg-primary/5 px-3 py-1 rounded-full">
                   {project.category}
                 </span>
-                <div className="flex gap-3 text-onSurface/40">
+                <div className="flex gap-3 text-onSurface/40" onClick={(e) => e.stopPropagation()}>
                   {project.github && project.github !== "#" && (
                     <a href={project.github} target="_blank" rel="noreferrer" className="hover:text-primary transition-colors">
                       <Github size={18} />
@@ -71,17 +74,28 @@ export default function ArchiveModal({ onClose, projects }) {
                 {project.title}
               </h3>
               
-              <p className="text-sm text-onSurface/70 leading-relaxed mb-6 flex-grow">
+              <p className="text-sm text-onSurface/70 leading-relaxed mb-6 flex-grow line-clamp-3">
                 {project.description}
               </p>
 
-              <div className="flex flex-wrap gap-2 mt-auto">
+              <div className="flex flex-wrap gap-2 mb-4">
                 {project.tags && project.tags.map((tag) => (
                   <span key={tag} className="text-[11px] font-medium text-onSurface/60 bg-gray-100 px-2.5 py-1 rounded-md">
                     {tag}
                   </span>
                 ))}
               </div>
+
+              {/* 🟢 NAYA BUTTON: Explicit "View Details" Button */}
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation(); // Double event fire hone se rokne ke liye
+                  if(onOpenDetails) onOpenDetails(project);
+                }}
+                className="mt-auto w-full py-3 bg-primary/5 text-primary text-sm font-bold rounded-full flex items-center justify-center gap-2 transition-all group-hover:bg-primary group-hover:text-white"
+              >
+                View Details <ArrowUpRight size={16} />
+              </button>
             </motion.div>
           ))}
         </div>
