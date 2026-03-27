@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Panel - Mudassir Nadeem</title>
+    <link rel="icon" type="image/png" href="/icon.png" />
   </head>
   <body>
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
@@ -44,9 +45,7 @@
             }, tag);
           });
 
-          // 🟢 THE ULTIMATE FIX: Strict Image Field Check
           var imageField = entry.getIn(['data', 'image']);
-          // Check if user has ACTUALLY uploaded an image
           var hasImage = imageField != null && imageField !== '';
 
           return h('div', { style: { fontFamily: '"Plus Jakarta Sans", sans-serif', padding: '40px', backgroundColor: '#FEF7FF', minHeight: '100vh', boxSizing: 'border-box' } },
@@ -62,9 +61,7 @@
               h('div', { className: "w-full md:w-1/2 p-4 md:p-6" },
                 h('div', { className: "w-full h-full flex items-center justify-center overflow-hidden relative", style: { backgroundColor: '#E6E0E9', borderRadius: '24px', minHeight: '350px' } },
                   hasImage
-                    // 🟢 NATIVE CMS PREVIEW: Ab koi manual link generate nahi hoga, CMS khud Blob handle karega
                     ? h('div', { className: "w-full h-full flex items-center justify-center p-4 [&_img]:max-h-[300px] [&_img]:w-auto [&_img]:rounded-2xl [&_img]:shadow-md [&_img]:object-contain" }, this.props.widgetFor('image'))
-                    // Placeholder (Agar image upload nahi hui)
                     : h('div', { className: "flex flex-col items-center justify-center text-center", style: { color: '#49454F' } },
                         h('span', { style: { fontSize: '48px', marginBottom: '16px' } }, "📸"),
                         h('span', { className: "font-bold text-lg" }, "Material Frame")
