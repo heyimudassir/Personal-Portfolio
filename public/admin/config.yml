@@ -26,4 +26,4 @@ collections:
       - {label: "Video Demo (MP4)", name: "video", widget: "file", required: false}
       - {label: "Github Link", name: "github", widget: "string", required: false}
       - {label: "Live Demo Link", name: "link", widget: "string", required: false}
-      - {label: "Upload APK File", name: "apk", widget: "file", required: false}
+      - {label: "APK Download Link (Google Drive etc.)", name: "apk", widget: "string", required: false}
