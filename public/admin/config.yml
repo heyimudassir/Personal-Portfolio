@@ -3,7 +3,7 @@ backend:
   branch: main 
 
 # 🟢 NAYA: Login screen par aapki profile pic ya logo aayega
-logo_url: https://heyimudassir.netlify.app/avatar.webp
+logo_url: "https://heyimudassir.netlify.app/icon.png"
 
 media_folder: "public/uploads"
 public_folder: "/uploads"
@@ -26,3 +26,5 @@ collections:
       - {label: "Video Demo (MP4)", name: "video", widget: "file", required: false}
       - {label: "Github Link", name: "github", widget: "string", required: false}
       - {label: "Live Demo Link", name: "link", widget: "string", required: false}
+      # 👇 NAYA FIELD: APK Link ke liye
+      - {label: "APK Download Link", name: "apk", widget: "string", required: false}

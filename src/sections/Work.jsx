@@ -1,93 +1,46 @@
 import { useState, useRef } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { Github, ExternalLink, Cpu, Monitor, Play, X, ArrowRight } from "lucide-react";
+// 👇 Download icon add kiya hai APK ke liye
+import { Github, ExternalLink, Cpu, Monitor, Play, X, ArrowRight, Download } from "lucide-react"; 
 
-// --- MODAL COMPONENT ---
 import ArchiveModal from "./ArchiveModal"; 
 
-// --- ASSETS IMPORT ---
-import imgStudent from "../assets/desktopApp.svg";
-import vidStudent from "../assets/desktopAppVideo.mp4";
+// 🟢 CMS DYNAMIC DATA IMPORT
+const projectFiles = import.meta.glob('../content/projects/*.json', { eager: true });
+const iconColors = ["bg-purple-100", "bg-blue-100", "bg-orange-100", "bg-green-100", "bg-gray-200"];
 
-import imgSolar from "../assets/solarThumbnail.svg";
-import vidSolar from "../assets/solar.mp4";
-
-import imgFault from "../assets/Fault.svg";
-import vidFault from "../assets/FaultVideo.mp4";
-
-// --- COMBINED PROJECT DATA ---
-const projectsData = [
-  {
-    id: 1,
-    title: "Student Management System",
-    category: "Desktop App",
-    description: "A Python-based desktop application designed to simplify attendance tracking, student data handling, and overall academic management.",
-    tags: ["Python", "Tkinter", "CSV", "CustomTkinter"],
-    icon: <Monitor />,
-    color: "bg-purple-100",
-    image: imgStudent,
-    video: vidStudent,
-    github: "https://github.com/yourusername/student-system",
-    link: null, 
-    featured: true, 
-  },
-  {
-    id: 2,
-    title: "Solar Cleaner via Bluetooth",
-    category: "IoT System",
-    description: "IoT-based Solar Panel Cleaning System using HC-05 Bluetooth module. Allows remote cleaning via mobile app.",
-    tags: ["Arduino", "Python", "MQTT", "Sensors"],
-    icon: <Cpu />,
-    color: "bg-blue-100",
-    image: imgSolar,
-    video: vidSolar,
-    github: "https://github.com/yourusername/solar-cleaner",
-    link: null,
-    featured: true,
-  },
-  {
-    id: 3,
-    title: "Fault Detection System",
-    category: "Real-time IoT",
-    description: "Real-time fault detection system ensuring safety in industrial environments using advanced sensors.",
-    tags: ["IoT", "Real-time", "C++", "Hardware"],
-    icon: <Cpu />,
-    color: "bg-orange-100",
-    image: imgFault,
-    video: vidFault,
-    github: "https://github.com/yourusername/fault-detection",
-    link: null,
-    featured: true,
-  },
-  {
-    id: 4,
-    title: "Fileforma Web Tool",
-    category: "Web App",
-    description: "A fast, responsive web application utilizing ConvertAPI for seamless document format transformations directly in the browser.",
-    tags: ["Next.js", "Tailwind CSS", "API"],
-    icon: <Monitor />,
-    color: "bg-green-100",
-    image: null, 
-    video: null,
-    github: "#",
-    link: "https://heyimudassir.netlify.app", 
-    featured: false, 
-  },
-  {
-    id: 5,
-    title: "Workshop POS System",
-    category: "Desktop App",
-    description: "A robust desktop application tailored for a bike spare parts workshop, handling real-time inventory tracking and order management.",
-    tags: ["C#", "WPF", "SQL Database"],
-    icon: <Monitor />,
-    color: "bg-gray-200",
-    image: null,
-    video: null,
-    github: "#",
-    link: null,
-    featured: false, 
+const projectsData = Object.keys(projectFiles).map((key, index) => {
+  const project = projectFiles[key].default;
+  
+  let cleanTags = [];
+  if (project.tags) {
+    if (typeof project.tags === 'string') {
+      cleanTags = project.tags.split(',').map(t => t.trim());
+    } else if (Array.isArray(project.tags)) {
+      if (project.tags.length === 1 && typeof project.tags[0] === 'string' && project.tags[0].includes(',')) {
+        cleanTags = project.tags[0].split(',').map(t => t.trim());
+      } else {
+        cleanTags = project.tags;
+      }
+    }
   }
-];
+
+  return {
+    id: index + 1,
+    title: project.title || "Untitled Project",
+    category: project.category || "Development",
+    description: project.description || "",
+    tags: cleanTags,
+    icon: project.category?.toLowerCase().includes("iot") ? <Cpu /> : <Monitor />,
+    color: iconColors[index % iconColors.length],
+    image: project.image || null,
+    video: project.video || null,
+    github: project.github || null,
+    link: project.link || null,
+    apk: project.apk || null, // 👇 Naya APK field CMS se uthaney ke liye
+    featured: project.featured === true || project.featured === "true",
+  };
+});
 
 // --- SINGLE CARD COMPONENT ---
 const ProjectCard = ({ project, index, targetScale, onOpenVideo }) => {
@@ -102,14 +55,13 @@ const ProjectCard = ({ project, index, targetScale, onOpenVideo }) => {
   return (
     <div ref={container} className="h-screen flex items-center justify-center sticky top-20 md:top-28">
       <motion.div 
-        // 🔴 GPU Optimization added here for smooth stacking
         style={{ scale, top: `calc(-5vh + ${index * 15}px)`, WebkitBackfaceVisibility: 'hidden' }} 
-        className="relative z-10 flex flex-col md:flex-row gap-4 md:gap-8 w-full max-w-5xl h-[70vh] bg-white border border-white/20 rounded-[30px] md:rounded-[40px] p-6 md:p-12 shadow-2xl origin-top transform-gpu will-change-transform"
+        className="relative z-10 flex flex-col md:flex-row gap-4 md:gap-8 w-full max-w-4xl h-[70vh] bg-white border border-white/20 rounded-[30px] md:rounded-[40px] p-6 md:p-10 shadow-2xl origin-top transform-gpu will-change-transform"
       >
         
         {/* Left Side: Content */}
-        <div className="w-full md:w-1/2 flex flex-col justify-center gap-3 md:gap-6 h-full order-2 md:order-1">
-           <div className="flex flex-col gap-2 md:gap-4">
+        <div className="w-full md:w-1/2 flex flex-col justify-center gap-2 md:gap-4 h-full order-2 md:order-1 py-4 md:py-8">
+           <div className="flex flex-col gap-2 md:gap-3">
              <div className="flex items-center gap-2 md:gap-3">
                <span className={`p-2 md:p-3 rounded-full ${project.color} text-onSurface`}>
                  {project.icon}
@@ -127,36 +79,62 @@ const ProjectCard = ({ project, index, targetScale, onOpenVideo }) => {
                {project.description}
              </p>
              
-             <div className="flex flex-wrap gap-2">
-               {project.tags.map(tag => (
-                 <span key={tag} className="px-2 py-1 md:px-3 md:py-1 bg-surface rounded-full text-[10px] md:text-xs font-medium border border-primary/10">
+             <div className="flex flex-wrap gap-2 mt-1">
+               {project.tags.map((tag, i) => (
+                 <span key={i} className="px-2 py-1 md:px-3 md:py-1 bg-surface rounded-full text-[10px] md:text-xs font-medium border border-primary/10">
                    {tag}
                  </span>
                ))}
              </div>
            </div>
 
-           <div className="flex flex-wrap gap-3 md:gap-4 mt-1 md:mt-2">
-             {project.video ? (
+           {/* 👇 DYNAMIC BUTTONS LOGIC: Jo available hoga, sirf wo show hoga */}
+           <div className="flex flex-wrap gap-3 md:gap-4 mt-2 md:mt-4">
+             {/* 1. Watch Preview Button */}
+             {project.video && (
                <button 
                  onClick={() => onOpenVideo(project.video)}
-                 className="flex items-center justify-center gap-2 px-5 py-3 bg-primary text-white rounded-full font-bold hover:bg-primaryDark transition-all active:scale-95 shadow-md hover:shadow-lg text-sm md:text-base w-full md:w-auto"
+                 className="flex items-center justify-center gap-2 px-5 py-3 bg-[#6355a5] text-white rounded-full font-bold hover:bg-[#524490] transition-all active:scale-95 shadow-md text-sm md:text-base w-full md:w-auto"
                >
                  <Play size={18} fill="currentColor" /> Watch Preview
                </button>
-             ) : (
-               <>
-                 {project.github && (
-                   <a href={project.github} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 px-5 py-3 bg-onSurface text-surface rounded-full font-bold hover:bg-primary transition-colors text-sm md:text-base flex-1 md:flex-none">
-                     <Github size={18} /> Code
-                   </a>
-                 )}
-                 {project.link && (
-                   <a href={project.link} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 px-5 py-3 bg-surface text-onSurface border border-onSurface/10 rounded-full font-bold hover:bg-primary/5 transition-colors text-sm md:text-base flex-1 md:flex-none">
-                     <ExternalLink size={18} /> Demo
-                   </a>
-                 )}
-               </>
+             )}
+
+             {/* 2. Download APK Button */}
+             {project.apk && (
+               <a 
+                 href={project.apk} 
+                 target="_blank" 
+                 rel="noreferrer" 
+                 download
+                 className="flex items-center justify-center gap-2 px-5 py-3 bg-green-600 text-white rounded-full font-bold hover:bg-green-700 transition-colors shadow-md text-sm md:text-base w-full md:w-auto"
+               >
+                 <Download size={18} /> APK
+               </a>
+             )}
+
+             {/* 3. Github Code Button */}
+             {project.github && (
+               <a 
+                 href={project.github} 
+                 target="_blank" 
+                 rel="noreferrer" 
+                 className="flex items-center justify-center gap-2 px-5 py-3 bg-black text-white rounded-full font-bold hover:bg-gray-800 transition-colors shadow-md text-sm md:text-base flex-1 md:flex-none"
+               >
+                 <Github size={18} /> Code
+               </a>
+             )}
+
+             {/* 4. Live Demo Button */}
+             {project.link && (
+               <a 
+                 href={project.link} 
+                 target="_blank" 
+                 rel="noreferrer" 
+                 className="flex items-center justify-center gap-2 px-5 py-3 bg-gray-100 text-black border border-gray-200 rounded-full font-bold hover:bg-gray-200 transition-colors text-sm md:text-base flex-1 md:flex-none"
+               >
+                 <ExternalLink size={18} /> Demo
+               </a>
              )}
            </div>
         </div>
@@ -184,7 +162,8 @@ export default function Work() {
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
 
-  const featuredProjects = projectsData.filter(p => p.featured);
+  // 👇 LIMIT TO 3 PROJECTS: filter kiya aur slice(0, 3) laga diya
+  const featuredProjects = projectsData.filter(p => p.featured).slice(0, 3);
 
   return (
     <section id="work" className="relative pt-24 md:pt-32 pb-32" ref={container}>
